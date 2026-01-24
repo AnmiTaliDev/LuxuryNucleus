@@ -1,12 +1,5 @@
-#define mmio_addr_graphics_fb_vga_text (volatile unsigned short*)0xB8000
-
 namespace VGA
 {
-    volatile unsigned short* const vga_buffer = mmio_addr_graphics_fb_vga_text;
-    // Static VGA text framebuffer info
-    constexpr unsigned vga_width  = 80; // shows 79
-    constexpr unsigned vga_height = 25; // shows 24
-
     enum vga_colors
     {
         BLACK = 0,
@@ -36,17 +29,11 @@ namespace VGA
         enum vga_colors color_fg;
         enum vga_colors color_bg;
         void newline();
-        void set_color(enum vga_colors foreground, enum vga_colors background);
-        void put_char_at(const unsigned short &what, const unsigned &X, const unsigned &Y);
-        void put_char(const unsigned short &what);
+        void set_color(const enum vga_colors &foreground, const enum vga_colors &background);
+        void put_entry_at(const unsigned short &entry, const unsigned &X, const unsigned &Y);
+        void put_char(const unsigned char &what);
         void clean();
         void scroll();
         vga_text_fb();
     };
-    namespace helper
-    {
-        extern vga_text_fb *fb;
-        void fb_func(const char &data);
-    }
 }
-

@@ -1,6 +1,6 @@
 #include <general/fbcon.hpp>
 #include <general/logging.hpp>
-#include <drivers/graphics/fb/vga.hpp>
+#include <general/helpers/fb.hpp>
 
 void (*fbcon::fb_func)(const char&) = nullptr;
 
@@ -11,7 +11,7 @@ void (*fbcon::fb_func)(const char&) = nullptr;
 }*/
 
 void fbcon::update_fb_helper(void (*func)(const char&)){
-    Logging::info("fbcon: updating framebuffer helper...");
+    Logging::info("[fbcon]: updating framebuffer helper...");
     fb_func = func;
     Logging::write_char = Logging::_write_char__with_fbcon;
 }
@@ -19,29 +19,25 @@ void fbcon::update_fb_helper(void (*func)(const char&)){
 static bool fbcon_choose_fb()
 {
     // VGA text framebuffer
-    static VGA::vga_text_fb vga_fb;
-    if (vga_fb.init)
+    if (Helpers::FB::VGA_text::init())
     {
-        VGA::helper::fb = &vga_fb;
-        Logging::info("fbcon: using VGA text fb helper");
-        fbcon::update_fb_helper(VGA::helper::fb_func);
-        return VGA::helper::fb->init;
+        Logging::info("[fbcon]: setting VGA text as primary fb.");
+        fbcon::update_fb_helper(Helpers::FB::VGA_text::print);
+        return true;
     }
     return false;
 }
 
 void fbcon::init()
 {
-    Logging::info("fbcon: initializing, choosing fb helper...");
+    Logging::info("[fbcon]: initializing, choosing fb helper...");
     if (fbcon_choose_fb())
     {
         for (unsigned len = 0; len != Logging::buf_size; len++)
             fb_func(Logging::buffer[len]);
         Logging::info("---------------------------------");
-        Logging::info("fbcon: exported logs buffer to fb");
+        Logging::info("[fbcon]: exported logs buffer to fb");
     }
     else
-    {
-        Logging::info("fbcon: no showing fb was detected");
-    }
+        Logging::info("[fbcon]: no active fb was detected");
 }

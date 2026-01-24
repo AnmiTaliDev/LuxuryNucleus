@@ -1,7 +1,4 @@
-#include <general/logging.hpp>
-#include <general/fbcon.hpp>
-#include <drivers/graphics/fb/vga.hpp>
-void kernel_init_start() asm("kernel_init_start");
+#include <general/init/main.hpp>
 
 void kernel_init_start()
 {

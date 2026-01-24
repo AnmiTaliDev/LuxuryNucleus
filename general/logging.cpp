@@ -1,9 +1,9 @@
 #include <general/logging.hpp>
 #include <general/fbcon.hpp>
 
-const char *info_prefix = "<*> ";
-const char *warn_prefix = "<!> ";
-const char *err_prefix  = "<#> ";
+constexpr const char *info_prefix = "<*> ";
+constexpr const char *warn_prefix = "<!> ";
+constexpr const char *err_prefix  = "<E> ";
 
 char* Logging::buffer;
 unsigned Logging::buf_size;
@@ -11,10 +11,9 @@ unsigned Logging::buf_size;
 void Logging::_write_char__buffer_only(const char &what)
 {
     buffer[buf_size] = what;
-    buf_size++;
+    if (buf_size++ == 1024)
+        buf_size = 0;
 }
-
-void (*Logging::write_char)(const char&) = Logging::_write_char__buffer_only;
 
 void Logging::_write_char__with_fbcon(const char &what)
 {
@@ -22,7 +21,9 @@ void Logging::_write_char__with_fbcon(const char &what)
     fbcon::fb_func(what);
 }
 
-void Logging::write_str(const char *&str)
+void (*Logging::write_char)(const char&) = Logging::_write_char__buffer_only;
+
+void Logging::write_str(const char *str)
 {
     unsigned len = 0;
     while (str[len])
@@ -58,8 +59,7 @@ void Logging::err(const char *log)
 
 void Logging::init()
 {
-    static char _buffer[1024];
-    for (unsigned i = 0; i != 1024; i++) _buffer[i] = 0;
+    static char _buffer[2048];
     buffer = _buffer;
     buf_size = 0;
     write_char = _write_char__buffer_only;

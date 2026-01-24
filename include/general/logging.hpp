@@ -5,7 +5,7 @@ namespace Logging
     extern void _write_char__buffer_only(const char &what);
     extern void _write_char__with_fbcon(const char &what);
     extern void (*write_char)(const char &what);
-    extern void write_str(const char *&str);
+    extern void write_str(const char *str);
     extern void write_line(const char *&str);
     
     extern void info(const char *log);
