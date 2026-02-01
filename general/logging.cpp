@@ -1,29 +1,48 @@
-#include <general/logging.hpp>
+#include <general/init/logging.hpp>
+#include <general/logging/con.hpp>
+#include <general/logging/log.hpp>
 #include <general/fbcon.hpp>
 
-constexpr const char *info_prefix = "<*> ";
-constexpr const char *warn_prefix = "<!> ";
-constexpr const char *err_prefix  = "<E> ";
+constexpr const char * const info_prefix = "<*> ";
+constexpr const char * const warn_prefix = "<!> ";
+constexpr const char * const err_prefix  = "<E> ";
 
-char* Logging::buffer;
-unsigned Logging::buf_size;
+Logging::buffer_instance *Logging::__buffer_instance = nullptr;
 
-void Logging::_write_char__buffer_only(const char &what)
+Logging::buffer_instance::buffer_instance()
 {
-    buffer[buf_size] = what;
-    if (buf_size++ == 1024)
-        buf_size = 0;
+    char buff[1024];
+    buffer = buff;
+    buffer_size = 0;
 }
 
-void Logging::_write_char__with_fbcon(const char &what)
+static void __write_char_buffer_only(const char &what)
 {
-    _write_char__buffer_only(what);
+    Logging::__buffer_instance->buffer[Logging::__buffer_instance->buffer_size] = what;
+    Logging::__buffer_instance->buffer_size++;
+}
+
+static void __write_char_with_fbcon(const char &what)
+{
+    __write_char_buffer_only(what);
     fbcon::fb_func(what);
 }
 
-void (*Logging::write_char)(const char&) = Logging::_write_char__buffer_only;
+void (*write_char)(const char&) = __write_char_buffer_only;
 
-void Logging::write_str(const char *str)
+char Logging::give_char_loop()
+{
+    static int len = -1;
+    len++;
+    return __buffer_instance->buffer[len];
+}
+
+void Logging::switch_write_char_func()
+{
+    write_char = __write_char_with_fbcon;
+}
+
+static void write_str(const char *str)
 {
     unsigned len = 0;
     while (str[len])
@@ -33,7 +52,7 @@ void Logging::write_str(const char *str)
     }
 }
 
-void Logging::write_line(const char *&str)
+static void write_line(const char *&str)
 {
     write_str(str);
     write_char('\n');
@@ -55,12 +74,4 @@ void Logging::err(const char *log)
 {
     write_str(err_prefix);
     write_line(log);
-}
-
-void Logging::init()
-{
-    static char _buffer[2048];
-    buffer = _buffer;
-    buf_size = 0;
-    write_char = _write_char__buffer_only;
 }

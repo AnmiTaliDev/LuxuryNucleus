@@ -21,19 +21,27 @@ namespace VGA
     };
     class vga_text_fb
     {
-    public:
-        bool init = false;
-        unsigned int  column;
-        unsigned int  row;
+        private:
+        //unsigned short *double_buffer;
+        unsigned short *scroll_row_buffer;
         unsigned char color;
         enum vga_colors color_fg;
         enum vga_colors color_bg;
-        void newline();
+        public:
+        bool init = false;
         void set_color(const enum vga_colors &foreground, const enum vga_colors &background);
-        void put_entry_at(const unsigned short &entry, const unsigned &X, const unsigned &Y);
-        void put_char(const unsigned char &what);
-        void clean();
+        void put_entry(const unsigned short &entry);
+        void put_char(const unsigned short &what);
+        //void sync();
         void scroll();
+        void fill_with_zeros();
+        void clean();
         vga_text_fb();
     };
+    /*class vga_graphics_fb
+    {
+        public:
+        bool init = false;
+        unsigned column, row;
+    };*/
 }
