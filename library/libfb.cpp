@@ -22,12 +22,10 @@ unsigned libfb::_calc_col_pos(const unsigned &__row_pos)
     return __row_pos + column;
 }
 
-unsigned libfb::D2toD1()
+unsigned libfb::TwoDto1D()
 {
     return _calc_col_pos(_calc_row_pos());
 }
 
-libfb::libfb(const unsigned &_width):row(0),column(0)
-{
-    width = _width;
-}
+libfb::libfb(const unsigned &_width, const unsigned &_height):width(_width),height(_height)
+{}

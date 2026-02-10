@@ -5,13 +5,15 @@ namespace Library
         class libfb
         {
             public:
-            unsigned row, column, width;
+            //bool not_newlined_at_end = false;
+            unsigned row = 0, column = 0;
+            const unsigned &width, &height;
             void _rst_col();
             void newline();
             unsigned _calc_row_pos();
             unsigned _calc_col_pos(const unsigned &__row_pos);
-            unsigned D2toD1();
-            libfb(const unsigned &_width);
+            unsigned TwoDto1D();
+            libfb(const unsigned &_width, const unsigned &_height);
         };
     }
 }

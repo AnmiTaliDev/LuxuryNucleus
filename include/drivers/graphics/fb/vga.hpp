@@ -21,18 +21,12 @@ namespace VGA
     };
     class vga_text_fb
     {
-        private:
-        //unsigned short *double_buffer;
-        unsigned short *scroll_row_buffer;
-        unsigned char color;
-        enum vga_colors color_fg;
-        enum vga_colors color_bg;
         public:
         bool init = false;
-        void set_color(const enum vga_colors &foreground, const enum vga_colors &background);
+        unsigned short attribute;
         void put_entry(const unsigned short &entry);
         void put_char(const unsigned short &what);
-        //void sync();
+        void set_attr(const enum vga_colors &foreground, const enum vga_colors &background, const bool &blink);
         void scroll();
         void fill_with_zeros();
         void clean();

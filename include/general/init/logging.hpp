@@ -3,7 +3,7 @@ namespace Logging
     class buffer_instance
     {
         public:
-        char* buffer;
+        unsigned char* buffer;
         unsigned buffer_size;
         buffer_instance();
     };

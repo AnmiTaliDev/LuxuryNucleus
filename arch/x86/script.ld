@@ -1,32 +1,44 @@
-/* Source: OSDev Wiki (Bare Bones) */
+/* Source: OSDev Wiki */
+KERNEL_VMA = 2M;
 ENTRY(_start)
-
 SECTIONS
 {
-	. = 2M;
+    . = KERNEL_VMA;
 
-	.text BLOCK(4K) : ALIGN(4K)
-	{
+    .text : AT(ADDR(.text) - KERNEL_VMA)
+    {
 		*(.multiboot)
-		*(.text)
-	}
+        _code = .;
+        *(.text)
+        *(.rodata*)
+        . = ALIGN(4096);
+    }
 
-	/* Read-write data (uninitialized) and stack */
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
-		*(COMMON)
-		*(.bss)
-	}
+   .data : AT(ADDR(.data) - KERNEL_VMA)
+   {
+        _data = .;
+        *(.data)
+        . = ALIGN(4096);
+   }
 
-	/* Read-only data. */
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
-		*(.rodata)
-	}
+   .bss : AT(ADDR(.bss) - KERNEL_VMA)
+   {
+       _bss = .;
+       *(.bss)
 
-	/* Read-write data (initialized) */
-	.data BLOCK(4K) : ALIGN(4K)
-	{
-		*(.data)
-	}
+       /*
+        * You usually need to include generated COMMON symbols
+        * under kernel BSS section or use gcc's -fno-common
+        */
+
+        //*(COMMON)
+       . = ALIGN(4096);
+   }
+
+   _end = .;
+
+   /DISCARD/ :
+   {
+        *(.comment)
+   }
 }

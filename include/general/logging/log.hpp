@@ -1,6 +1,6 @@
 namespace Logging
 {   
-    extern void info(const char *log);
-    extern void warn(const char *log);
-    extern void err(const char *log);
+    extern void info(const unsigned char *log);
+    extern void warn(const unsigned char *log);
+    extern void err(const unsigned char *log);
 }

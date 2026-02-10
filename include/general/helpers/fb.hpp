@@ -4,8 +4,13 @@ namespace Helpers
     {
         namespace VGA_text
         {
-            void print(const char &what);
-            bool init();
+            class instance
+            {
+                public:
+                bool *init;
+                instance();
+            };
+            void print(const unsigned char &what);
         };
     }
 }
