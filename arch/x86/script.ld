@@ -1,44 +1,29 @@
 /* Source: OSDev Wiki */
-KERNEL_VMA = 2M;
 ENTRY(_start)
 SECTIONS
 {
-    . = KERNEL_VMA;
-
-    .text : AT(ADDR(.text) - KERNEL_VMA)
+    .multiboot : ALIGN(8)
     {
-		*(.multiboot)
-        _code = .;
-        *(.text)
-        *(.rodata*)
-        . = ALIGN(4096);
+        KEEP(*(.multiboot))
     }
 
-   .data : AT(ADDR(.data) - KERNEL_VMA)
+    .text :
+    {
+        *(.text)
+    }
+
+    .rodata :
+    {
+        *(.rodata)
+    }
+
+   .data :
    {
-        _data = .;
         *(.data)
-        . = ALIGN(4096);
    }
 
-   .bss : AT(ADDR(.bss) - KERNEL_VMA)
+   .bss :
    {
-       _bss = .;
        *(.bss)
-
-       /*
-        * You usually need to include generated COMMON symbols
-        * under kernel BSS section or use gcc's -fno-common
-        */
-
-        //*(COMMON)
-       . = ALIGN(4096);
-   }
-
-   _end = .;
-
-   /DISCARD/ :
-   {
-        *(.comment)
    }
 }

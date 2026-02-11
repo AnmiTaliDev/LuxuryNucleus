@@ -10,5 +10,5 @@ void kernel_init_start()
     Logging::__buffer_instance = &__Logging;
     Logging::info("Starting PlumberCore...");
     fbcon::init();
-    Logging::info("fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+    Logging::info("vsdvfdfd");
 }

@@ -5,8 +5,8 @@ project(PlumberCore CXX ASM)
 enable_language(ASM)
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/arch/x86/script.ld")
-add_compile_options(-Wall -Wextra -O0 -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -ffreestanding -fno-exceptions -fno-rtti -funsigned-char -fno-signed-char -fpermissive -fno-common)
-add_link_options(-T${LINKER_SCRIPT} -z noexecstack -nostdlib -O0)
+add_compile_options(-Wall -Wextra -O0 -m32 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -ffreestanding -fno-exceptions -fno-rtti -funsigned-char -fno-signed-char -fpermissive -fno-common)
+add_link_options(-m32 -T${LINKER_SCRIPT} -z noexecstack -nostdlib -O0)
 include_directories("include")
 
 # Deps
