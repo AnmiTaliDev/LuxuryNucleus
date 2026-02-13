@@ -7,8 +7,8 @@ VGA text framebuffer driver for legacy BIOS
 #include <library/libfb.hpp>
 #include <general/logging/log.hpp>
 
-#define mmio_addr_vga_text_fb_colour     reinterpret_cast<volatile unsigned short*const>(0xB8000)
-#define mmio_addr_vga_text_fb_monochrome reinterpret_cast<volatile unsigned short*const>(0xB0000)
+#define mmio_addr_vga_text_fb_colour     reinterpret_cast<volatile unsigned short*>(0xB8000)
+#define mmio_addr_vga_text_fb_monochrome reinterpret_cast<volatile unsigned short*>(0xB0000)
 #define vga_text_width  80
 #define vga_text_height 25
 
@@ -16,7 +16,7 @@ Library::libfb::libfb   *vga_text_libfb;
 volatile unsigned short *vga_text_buffer;
 unsigned short          *vga_text_scroll_buffer;
 
-volatile unsigned char  *const vga_graphics_buffer = reinterpret_cast<volatile unsigned char*const>(0xA0000);
+volatile unsigned char  *const vga_graphics_buffer = reinterpret_cast<volatile unsigned char*>(0xA0000);
 
 void VGA::vga_text_fb::put_entry(const unsigned short &entry) 
 {
@@ -37,10 +37,9 @@ void VGA::vga_text_fb::set_attr(const enum vga_colors &foreground, const enum vg
 
 void VGA::vga_text_fb::clean()
 {
-    set_attr(LIGHT_GRAY, BLACK, 1);
+    set_attr(LIGHT_GRAY, BLACK, 0);
     for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
         fill_with_zeros();
-    vga_text_libfb->_rst_col();
     vga_text_libfb->row = 0;
 }
 
@@ -104,9 +103,9 @@ VGA::vga_text_fb::vga_text_fb()
         if (size == 16388)
         {
             Logging::info("[vga/text]: initializing fb...");
-            Library::libfb::libfb __vga_text_libfb(vga_text_width,vga_text_height);
+            static Library::libfb::libfb __vga_text_libfb(vga_text_width,vga_text_height);
             vga_text_libfb = &__vga_text_libfb;
-            unsigned short __scroll_row_buff[80];
+            static unsigned short __scroll_row_buff[80];
             vga_text_scroll_buffer = __scroll_row_buff;
             /*unsigned short __double_buff[16388];
             double_buffer = __double_buff;*/

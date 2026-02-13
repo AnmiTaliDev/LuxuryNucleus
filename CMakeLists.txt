@@ -5,15 +5,13 @@ project(PlumberCore CXX ASM)
 enable_language(ASM)
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/arch/x86/script.ld")
-add_compile_options(-Wall -Wextra -O0 -m32 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -ffreestanding -fno-exceptions -fno-rtti -funsigned-char -fno-signed-char -fpermissive -fno-common)
-add_link_options(-m32 -T${LINKER_SCRIPT} -z noexecstack -nostdlib -O0)
+add_compile_options(-Wall -Wextra -O0 -ffreestanding -funsigned-char -fno-rtti -fno-exceptions -fno-threadsafe-statics -fno-signed-char -fpermissive -fno-common -m32 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -nostdlib)
+add_link_options(-T${LINKER_SCRIPT} -z noexecstack -nostdlib -O0 -m32)
 include_directories("include")
 
 # Deps
 add_library(arch_boot OBJECT arch/x86/boot.s)
-add_library(arch_stack arch/x86/stack.cpp)
-add_library(arch_multiboot2 arch/x86/multiboot2.cpp)
-#add_library(arch_pvh_note OBJECT arch/x86/pvh/head.s)
+add_library(library_strmgr OBJECT library/strmgr.cpp)
 add_library(library_libfb OBJECT library/libfb.cpp)
 add_library(driver_bda OBJECT drivers/bda.cpp)
 add_library(driver_fb_vga OBJECT drivers/graphics/fb/vga.cpp)
@@ -24,8 +22,8 @@ add_library(general_fbcon OBJECT general/fbcon.cpp)
 # Kernel
 add_executable(pcore.elf general/init/main.cpp)
 set_target_properties(pcore.elf PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT})
-target_link_libraries(pcore.elf PRIVATE arch_boot arch_stack arch_multiboot2
-                                library_libfb
+target_link_libraries(pcore.elf PRIVATE arch_boot
+                                library_strmgr library_libfb
                                 driver_bda driver_fb_vga
                                 helper_fb
                                 general_logging general_fbcon) # Deps

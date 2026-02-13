@@ -10,7 +10,7 @@ namespace Helpers
                 bool *init;
                 instance();
             };
-            void print(const unsigned char &what);
+            void print(const char &what);
         };
     }
 }
