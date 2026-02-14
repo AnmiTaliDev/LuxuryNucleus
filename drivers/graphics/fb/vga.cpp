@@ -6,9 +6,8 @@ VGA text framebuffer driver for legacy BIOS
 #include <drivers/bda.hpp>
 #include <library/libfb.hpp>
 #include <general/logging/log.hpp>
+#include <mmio/vga.hpp>
 
-#define mmio_addr_vga_text_fb_colour     reinterpret_cast<volatile unsigned short*>(0xB8000)
-#define mmio_addr_vga_text_fb_monochrome reinterpret_cast<volatile unsigned short*>(0xB0000)
 #define vga_text_width  80
 #define vga_text_height 25
 
@@ -16,7 +15,7 @@ Library::libfb::libfb   *vga_text_libfb;
 volatile unsigned short *vga_text_buffer;
 unsigned short          *vga_text_scroll_buffer;
 
-volatile unsigned char  *const vga_graphics_buffer = reinterpret_cast<volatile unsigned char*>(0xA0000);
+volatile unsigned char  *const vga_graphics_buffer = mmio_addr_vga_graphics_fb;
 
 void VGA::vga_text_fb::put_entry(const unsigned short &entry) 
 {

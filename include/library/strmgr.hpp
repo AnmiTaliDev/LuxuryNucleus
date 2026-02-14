@@ -2,6 +2,6 @@ namespace Library
 {
     namespace strmgr
     {
-        
+
     }
 }

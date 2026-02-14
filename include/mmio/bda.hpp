@@ -1,0 +1,1 @@
+#define mmio_addr_bda reinterpret_cast<const volatile unsigned short*>(0x410)
