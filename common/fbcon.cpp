@@ -1,7 +1,6 @@
-#include <general/init/fbcon.hpp>
-#include <general/logging/con.hpp>
-#include <general/logging/log.hpp>
-#include <general/helpers/fb.hpp>
+#include <logging/con.hpp>
+#include <logging/log.hpp>
+#include <helpers/fb.hpp>
 
 //constexpr char log_prefix[10] = "[fbcon]: ";
 void (*fbcon::fb_func)(const char&);

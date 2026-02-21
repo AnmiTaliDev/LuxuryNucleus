@@ -2,11 +2,9 @@
 VGA text framebuffer driver for legacy BIOS
 */
 
-#include <drivers/graphics/fb/vga.hpp>
 #include <drivers/bda.hpp>
 #include <library/libfb.hpp>
-#include <general/logging/log.hpp>
-#include <mmio/vga.hpp>
+#include <logging/log.hpp>
 
 #define vga_text_width  80
 #define vga_text_height 25

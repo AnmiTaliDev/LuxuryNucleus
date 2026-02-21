@@ -1,5 +1,4 @@
-#include <general/helpers/fb.hpp>
-#include <general/logging/log.hpp>
+#include <logging/log.hpp>
 #include <drivers/graphics/fb/vga.hpp>
 
 VGA::vga_text_fb *VGA_text_instance = nullptr;

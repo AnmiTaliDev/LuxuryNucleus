@@ -1,30 +1,30 @@
 ENTRY(_start)
-SECTIONS
-{
-	pcore_page_size = 4K;
-	pcore_start = pcore_page_size * 500;
-	. = pcore_start;
+pcore_start = 2M;
+SECTIONS {
+    . = pcore_start;
 
-	.text BLOCK(pcore_page_size) : ALIGN(pcore_page_size)
-	{
-		*(.multiboot)
-		*(.text)
-	}
+    .text : {
+        *(.multiboot)
+        *(.text*)
+    }
 
-	.bss BLOCK(pcore_page_size) : ALIGN(pcore_page_size)
-	{
-		*(.bss)
-	}
+    .data : {
+        *(.data*)
+    }
 
-	.rodata BLOCK(pcore_page_size) : ALIGN(pcore_page_size)
-	{
-		*(.rodata)
-	}
+    .rodata : {
+        *(.rodata*)
+    }
 
-	.data BLOCK(pcore_page_size) : ALIGN(pcore_page_size)
-	{
-		*(.data)
-	}
+    .bss : {
+        *(.bss*)
+    }
+    
+    pcore_end = .;
 
-	pcore_end = .;
+    /DISCARD/ :
+    {
+        *(.eh_frame*)
+        *(.comment)
+    }
 }

@@ -1,8 +1,3 @@
-#include <general/init/logging.hpp>
-#include <library/strmgr.hpp>
-#include <general/logging/con.hpp>
-#include <general/logging/log.hpp>
-
 constexpr static const char * const info_prefix = "<*> ";
 constexpr static const char * const warn_prefix = "<!> ";
 constexpr static const char * const err_prefix  = "<E> ";
