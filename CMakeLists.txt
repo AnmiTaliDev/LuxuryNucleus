@@ -21,7 +21,7 @@ add_subdirectory(helpers)
 
 # Kernel
 set_target_properties(PlumberCore PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT} RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-target_link_libraries(PlumberCore PRIVATE arch_boot arch_multiboot2
+target_link_libraries(PlumberCore PRIVATE arch_boot
                                   library_strmgr library_libfb
                                   driver_bda driver_fb_vga
                                   helper_fb
