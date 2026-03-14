@@ -21,8 +21,8 @@ unsigned char Library::strmgr::inb(unsigned short port)
     );
     return data;
 }
-
-char *Library::strmgr::itos(int integer)
+/*
+char* Library::strmgr::itos(int integer)
 {
     if (integer == 0) return "0";
     bool negative = false;
@@ -79,3 +79,4 @@ char *Library::strmgr::itos(int integer)
     }
     return output;
 }
+*/

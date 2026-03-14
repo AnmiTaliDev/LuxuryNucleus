@@ -21,10 +21,4 @@ SECTIONS {
     }
     
     pcore_end = .;
-
-    /DISCARD/ :
-    {
-        *(.eh_frame*)
-        *(.comment)
-    }
 }
