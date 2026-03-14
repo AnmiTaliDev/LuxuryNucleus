@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 4.1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_BUILD_TYPE Release)
 project(PlumberCore CXX ASM)
 
 # Options
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/arch/x86/script.ld")
 add_compile_options(-Wall -Wextra -O0 -ffreestanding -funsigned-char -fpermissive
                     -fno-signed-char -fno-common -fno-rtti -fno-exceptions -fno-threadsafe-statics
-                    -mcmodel=large -mno-red-zone -nostdlib)
-add_link_options(-T${LINKER_SCRIPT} -nostdlib -O0)
+                    -m32 -mno-red-zone -nostdlib)
+add_link_options(-T${LINKER_SCRIPT} -nostdlib -O0 -m32)
 include_directories("include")
 
 # Deps

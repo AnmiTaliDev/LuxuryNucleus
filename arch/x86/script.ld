@@ -5,19 +5,19 @@ SECTIONS {
 
     .text : {
         KEEP(*(.multiboot2))
-        *(.text*)
+        *(.text)
     }
 
     .data : {
-        *(.data*)
+        *(.data)
     }
 
     .rodata : {
-        *(.rodata*)
+        *(.rodata)
     }
 
     .bss : {
-        *(.bss*)
+        *(.bss)
     }
     
     pcore_end = .;

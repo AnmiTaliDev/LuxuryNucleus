@@ -13,7 +13,7 @@ Library::libfb::libfb   *vga_text_libfb;
 volatile unsigned short *vga_text_buffer;
 unsigned short          *vga_text_scroll_buffer;
 
-volatile unsigned char  *const vga_graphics_buffer = mmio_addr_vga_graphics_fb;
+//volatile unsigned char  *const vga_graphics_buffer = mmio_addr_vga_graphics_fb;
 
 void VGA::vga_text_fb::put_entry(const unsigned short &entry) 
 {

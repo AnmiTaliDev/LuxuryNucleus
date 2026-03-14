@@ -24,8 +24,7 @@ stack_top:
 .global _start
 .type _start, @function
 _start:
-    lea rsp, [stack_top]
     call kernel_init_start
     cli
-1:	hlt
-	jmp 1b
+1:  hlt
+    jmp 1b
