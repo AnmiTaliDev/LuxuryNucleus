@@ -1,1 +1,1 @@
-add_subdirectory(fb)
+add_subdirectory(gpu)

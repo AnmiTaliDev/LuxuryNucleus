@@ -1,14 +1,12 @@
+#include <logging.hpp>
 #include <init/logging.hpp>
 #include <init/fbcon.hpp>
-#include <logging/log.hpp>
-#include <helpers/fb.hpp>
-#include <library/strmgr.hpp>
-#include <uname.hpp>
-void kernel_init_start() asm("kernel_init_start");
+extern unsigned long long nkernel_end;
+void init_start() asm("init_start");
 
-void kernel_init_start()
+void init_start()
 {
     Logging::init();
+    Logging::info("Starting NucleusKernel...");
     fbcon::init();
-    Logging::info(uname_kernel);
 }

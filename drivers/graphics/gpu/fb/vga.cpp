@@ -3,36 +3,40 @@ VGA text framebuffer driver for legacy BIOS
 */
 
 #include <drivers/bda.hpp>
+#include <logging.hpp>
 #include <library/libfb.hpp>
-#include <logging/log.hpp>
+#include <drivers/graphics/gpu/fb/vga.hpp>
+#include <mmio/vga.hpp>
+#include <misc/vga_colors.hpp>
+using namespace Drivers::Graphics::FB::VGA;
+using namespace Miscellaneous::FB::VGA;
 
 #define vga_text_width  80
 #define vga_text_height 25
 
+//volatile unsigned char *const vga_graphics_buffer = mmio_addr_vga_graphics_fb;
 Library::libfb::libfb   *vga_text_libfb;
 volatile unsigned short *vga_text_buffer;
 unsigned short          *vga_text_scroll_buffer;
 
-//volatile unsigned char  *const vga_graphics_buffer = mmio_addr_vga_graphics_fb;
-
-void VGA::vga_text_fb::put_entry(const unsigned short &entry) 
+void vga_text_fb::put_entry(const unsigned short &entry) 
 {
 	vga_text_buffer[vga_text_libfb->TwoDto1D()] = entry | attribute;
 }
 
-void VGA::vga_text_fb::fill_with_zeros()
+void vga_text_fb::fill_with_zeros()
 {
     for (vga_text_libfb->_rst_col(); vga_text_libfb->column != vga_text_libfb->width; vga_text_libfb->column++)
 	    put_entry(0);
     vga_text_libfb->_rst_col();
 }
 
-void VGA::vga_text_fb::set_attr(const enum vga_colors &foreground, const enum vga_colors &background, const bool &blink)
+void vga_text_fb::set_attr(const unsigned short &foreground, const unsigned short &background, const bool &blink)
 {
     attribute = (foreground | background << 4 | blink << 7) << 8;
 }
 
-void VGA::vga_text_fb::clean()
+void vga_text_fb::clean()
 {
     set_attr(LIGHT_GRAY, BLACK, 0);
     for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
@@ -40,7 +44,7 @@ void VGA::vga_text_fb::clean()
     vga_text_libfb->row = 0;
 }
 
-void VGA::vga_text_fb::scroll()
+void vga_text_fb::scroll()
 {
     for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
     {
@@ -55,7 +59,7 @@ void VGA::vga_text_fb::scroll()
     fill_with_zeros();
 }
 
-void VGA::vga_text_fb::put_char(const unsigned short &what)
+void vga_text_fb::put_char(const unsigned short &what)
 {
     switch (what)
     {
@@ -74,7 +78,7 @@ void VGA::vga_text_fb::put_char(const unsigned short &what)
 	if (vga_text_libfb->row == vga_text_libfb->height) scroll();
 }
 
-VGA::vga_text_fb::vga_text_fb()
+vga_text_fb::vga_text_fb()
 {
     enum BDA::video_type videotype = BDA::video_type();
     if (videotype != BDA::VIDEO_TYPE_NONE)
@@ -102,9 +106,9 @@ VGA::vga_text_fb::vga_text_fb()
             Logging::info("[vga/text]: initializing fb...");
             static Library::libfb::libfb __vga_text_libfb(vga_text_width,vga_text_height);
             vga_text_libfb = &__vga_text_libfb;
-            static unsigned short __scroll_row_buff[80];
+            static unsigned short __scroll_row_buff[vga_text_width];
             vga_text_scroll_buffer = __scroll_row_buff;
-            /*unsigned short __double_buff[16388];
+            /*unsigned char __double_buff[16388];
             double_buffer = __double_buff;*/
             clean();
             init = true;

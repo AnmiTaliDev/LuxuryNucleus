@@ -1,3 +1,2 @@
-add_library(arch_boot OBJECT boot.s)
-
-target_compile_options(arch_boot PRIVATE -masm=intel)
+add_library(arch_bootstrap OBJECT bootstrap.s)
+add_library(arch_multiboot2 OBJECT multiboot2.s)

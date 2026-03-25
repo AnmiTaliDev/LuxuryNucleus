@@ -1,1 +1,0 @@
-extern const char *const uname_kernel;

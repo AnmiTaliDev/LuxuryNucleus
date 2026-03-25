@@ -1,24 +1,23 @@
-pcore_start = 2M;
-ENTRY(_start)
+nkernel_start = 2M;
 SECTIONS {
-    . = pcore_start;
+    . = nkernel_start;
 
     .text : {
         KEEP(*(.multiboot2))
         *(.text)
     }
 
-    .data : {
-        *(.data)
+    .bss : {
+        *(.bss)
     }
 
     .rodata : {
         *(.rodata)
     }
 
-    .bss : {
-        *(.bss)
+    .data : {
+        *(.data)
     }
     
-    pcore_end = .;
+    nkernel_end = .;
 }

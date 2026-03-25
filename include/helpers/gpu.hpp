@@ -1,8 +1,8 @@
 namespace Helpers
 {
-    namespace FB
+    namespace GPU
     {
-        namespace VGA_text
+        namespace SoftwareAccel
         {
             class instance
             {
@@ -10,7 +10,7 @@ namespace Helpers
                 bool *init;
                 instance();
             };
-            extern void put_char(const char&);
-        };
+            extern void draw_char(const char&);
+        }
     }
 }

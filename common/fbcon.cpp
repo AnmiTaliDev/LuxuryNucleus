@@ -1,37 +1,37 @@
-#include <logging/con.hpp>
-#include <logging/log.hpp>
-#include <helpers/fb.hpp>
+#include <logging.hpp>
+#include <helpers/gpu.hpp>
+#include <init/fbcon.hpp>
+#include <fbcon.hpp>
+using namespace Helpers::GPU;
 
 //constexpr char log_prefix[10] = "[fbcon]: ";
-void (*fbcon::fb_func)(const char&);
+void (*fbcon::fb_func)(const char&) = nullptr;
 
-static void update_fb_helper(void (*func)(const char&)){
-    Logging::info("[fbcon]: updating framebuffer helper...");
+static void set_gpu_helper(void (*func)(const char&)){
+    Logging::info("[fbcon]: updating GPU helper...");
     fbcon::fb_func = func;
 }
 
-static bool fbcon_choose_fb()
+static bool choose_primary_gpu()
 {
-    // VGA text framebuffer
-    Helpers::FB::VGA_text::instance vga_text;
-    if (vga_text.init)
+    // Software acceleration
+    static SoftwareAccel::instance software_acceleration;
+    if (software_acceleration.init)
     {
-        Logging::info("[fbcon]: setting VGA text as primary fb.");
-        update_fb_helper(Helpers::FB::VGA_text::print);
-        return vga_text.init;
+        Logging::info("[fbcon]: setting up software rendering...");
+        set_gpu_helper(SoftwareAccel::draw_char);
+        return software_acceleration.init;
     }
     return false;
 }
 
 void fbcon::init()
 {
-    Logging::info("[fbcon]: initializing, choosing fb helper...");
-    if (fbcon_choose_fb())
+    Logging::info("[fbcon]: initializing, choosing GPU helper...");
+    if (choose_primary_gpu())
     {
         Logging::switch_write_char_func();
-        Logging::info("------------------------------------");
-        Logging::info("[fbcon]: exported logs buffer to fb!");
     }
     else
-        Logging::info("[fbcon]: no active fb was detected");
+        Logging::warn("[fbcon]: no active GPU was detected");
 }

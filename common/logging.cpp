@@ -1,6 +1,10 @@
-constexpr static const char * const info_prefix = "<*> ";
-constexpr static const char * const warn_prefix = "<!> ";
-constexpr static const char * const err_prefix  = "<E> ";
+#include <fbcon.hpp>
+#include <init/logging.hpp>
+#include <logging.hpp>
+
+constexpr const char *info_prefix = "<*> ";
+constexpr const char *warn_prefix = "<!> ";
+constexpr const char *err_prefix  = "<E> ";
 
 char* buffer;
 unsigned long long buffer_size = 0;
@@ -17,12 +21,13 @@ static void __write_char_with_fbcon(const char &what)
     fbcon::fb_func(what);
 }
 
-static void (*write_char)(const char&) = __write_char_buffer_only;
+void (*write_char)(const char&) = nullptr;
 
 void Logging::init()
 {
     static char buff[8192];
     buffer = buff;
+    write_char = __write_char_buffer_only;
 }
 
 void Logging::switch_write_char_func()

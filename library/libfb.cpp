@@ -1,3 +1,5 @@
+#include <library/libfb.hpp>
+
 using namespace Library::libfb;
 
 void libfb::_rst_col()

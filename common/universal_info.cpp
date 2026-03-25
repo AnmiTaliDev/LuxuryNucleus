@@ -1,1 +1,0 @@
-constexpr const char *const uname_kernel = "MightyKernel";

@@ -1,3 +1,5 @@
+#include <library/strmgr.hpp>
+
 void Library::strmgr::outb(unsigned short port, unsigned char value)
 {
     asm volatile
