@@ -22,8 +22,8 @@ add_subdirectory(helpers)
 
 # Kernel
 set_target_properties(NucleusKernel PROPERTIES LINK_DEPENDS ${LINKER_SCRIPT} RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-target_link_libraries(NucleusKernel PRIVATE arch_multiboot2
+target_link_libraries(NucleusKernel PRIVATE arch_bootstrap arch_multiboot2
                                   library_strmgr library_libfb
                                   driver_gpu_software driver_bda driver_fb_vga
                                   helper_gpu helper_fb
-                                  common_logging common_fbcon)
+                                  common_mmio_get_ptr common_mmio_alloc common_logging common_fbcon)

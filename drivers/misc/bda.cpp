@@ -1,6 +1,6 @@
 #include <drivers/bda.hpp>
-#include <mmio/bda.hpp>
 
+#define mmio_addr_bda reinterpret_cast<const volatile unsigned short*>(0x410)
 const volatile unsigned short * const bda_detected_hw = mmio_addr_bda;
 
 enum BDA::video_type BDA::video_type()

@@ -5,14 +5,18 @@ VGA text framebuffer driver for legacy BIOS
 #include <drivers/bda.hpp>
 #include <logging.hpp>
 #include <library/libfb.hpp>
-#include <drivers/graphics/gpu/fb/vga.hpp>
-#include <mmio/vga.hpp>
 #include <misc/vga_colors.hpp>
+#include <mmio/get_ptr.hpp>
+#include <drivers/graphics/gpu/fb/vga.hpp>
 using namespace Drivers::Graphics::FB::VGA;
 using namespace Miscellaneous::FB::VGA;
 
 #define vga_text_width  80
 #define vga_text_height 25
+
+#define mmio_addr_vga_text_fb_colour     0xB8000
+#define mmio_addr_vga_text_fb_monochrome 0xB0000
+#define mmio_addr_vga_graphics_fb        0xA0000
 
 //volatile unsigned char *const vga_graphics_buffer = mmio_addr_vga_graphics_fb;
 Library::libfb::libfb   *vga_text_libfb;
@@ -87,11 +91,11 @@ vga_text_fb::vga_text_fb()
         {
             case BDA::VIDEO_TYPE_COLOUR:
                 Logging::info("[vga/text]: detected colour video type");
-                vga_text_buffer = mmio_addr_vga_text_fb_colour;
+                vga_text_buffer = ushort_ptr(mmio_addr_vga_text_fb_colour);
                 break;
             case BDA::VIDEO_TYPE_MONOCHROME:
                 Logging::info("[vga/text]: detected monochrome video type");
-                vga_text_buffer = mmio_addr_vga_text_fb_monochrome;
+                vga_text_buffer = ushort_ptr(mmio_addr_vga_text_fb_monochrome);
                 break;
             default:
                 Logging::err("[vga/text]: failed to get video type");

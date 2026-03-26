@@ -12,7 +12,7 @@ static void set_gpu_helper(void (*func)(const char&)){
     fbcon::fb_func = func;
 }
 
-static bool choose_primary_gpu()
+static void choose_primary_gpu()
 {
     // Software acceleration
     static SoftwareAccel::instance software_acceleration;
@@ -20,15 +20,14 @@ static bool choose_primary_gpu()
     {
         Logging::info("[fbcon]: setting up software rendering...");
         set_gpu_helper(SoftwareAccel::draw_char);
-        return software_acceleration.init;
     }
-    return false;
 }
 
 void fbcon::init()
 {
     Logging::info("[fbcon]: initializing, choosing GPU helper...");
-    if (choose_primary_gpu())
+    choose_primary_gpu();
+    if (fb_func != nullptr)
     {
         Logging::switch_write_char_func();
     }

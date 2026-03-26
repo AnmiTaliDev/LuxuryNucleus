@@ -1,3 +1,4 @@
+#include <mmio/alloc.hpp>
 #include <fbcon.hpp>
 #include <init/logging.hpp>
 #include <logging.hpp>
@@ -6,7 +7,7 @@ constexpr const char *info_prefix = "<*> ";
 constexpr const char *warn_prefix = "<!> ";
 constexpr const char *err_prefix  = "<E> ";
 
-char* buffer;
+volatile unsigned char* buffer;
 unsigned long long buffer_size = 0;
 
 static void __write_char_buffer_only(const char &what)
@@ -25,20 +26,15 @@ void (*write_char)(const char&) = nullptr;
 
 void Logging::init()
 {
-    static char buff[8192];
-    buffer = buff;
+    buffer = asciiz(80000);
     write_char = __write_char_buffer_only;
 }
 
 void Logging::switch_write_char_func()
 {
-    write_char = __write_char_with_fbcon;
-    unsigned len = 0;
-    while (len != buffer_size)
-    {
+    for (unsigned long long len = 0; len != buffer_size; len++)
         fbcon::fb_func(buffer[len]);
-        len++;
-    }
+    write_char = __write_char_with_fbcon;
 }
 
 static void write_str(const char *str)

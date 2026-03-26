@@ -1,4 +1,5 @@
 nkernel_start = 2M;
+ENTRY(_start)
 SECTIONS {
     . = nkernel_start;
 
