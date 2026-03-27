@@ -7,7 +7,7 @@ constexpr const char *info_prefix = "<*> ";
 constexpr const char *warn_prefix = "<!> ";
 constexpr const char *err_prefix  = "<E> ";
 
-volatile unsigned char* buffer;
+volatile unsigned char *buffer;
 unsigned long long buffer_size = 0;
 
 static void __write_char_buffer_only(const char &what)
@@ -26,14 +26,15 @@ void (*write_char)(const char&) = nullptr;
 
 void Logging::init()
 {
-    buffer = asciiz(80000);
+    buffer = asciiz(100);
     write_char = __write_char_buffer_only;
+    info("Initialized logger with 100 bytes of buffer");
 }
 
-void Logging::switch_write_char_func()
+void fbcon::switch_write_char_func()
 {
-    for (unsigned long long len = 0; len != buffer_size; len++)
-        fbcon::fb_func(buffer[len]);
+    for (unsigned long long len = ullint(); len != buffer_size; len++)
+        fb_func(buffer[len]);
     write_char = __write_char_with_fbcon;
 }
 

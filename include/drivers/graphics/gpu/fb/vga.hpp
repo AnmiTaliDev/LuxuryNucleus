@@ -1,3 +1,6 @@
+#include <misc/vga_colors.hpp>
+using namespace Miscellaneous::FB::VGA;
+
 namespace Drivers
 {
     namespace Graphics
@@ -13,7 +16,7 @@ namespace Drivers
                     unsigned short attribute;
                     void put_entry(const unsigned short &);
                     void put_char(const unsigned short &);
-                    void set_attr(const unsigned short &, const unsigned short &, const bool &);
+                    void set_attr(const enum vga_colors &, const enum vga_colors &, const bool &);
                     void scroll();
                     void fill_with_zeros();
                     void clean();

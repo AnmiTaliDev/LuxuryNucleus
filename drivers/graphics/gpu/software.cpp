@@ -9,22 +9,31 @@ The "software acceleration" GPU driver
 using namespace Drivers::Graphics::GPU;
 using namespace Helpers::FB;
 
-void Software::set_fb_helper(void (*func)(const char&))
+void (*draw_func)(const char&) = nullptr;
+
+static void set_fb_helper(void (*func)(const char&))
 {
     Logging::info("[gpu/software]: updating framebuffer helper...");
-    draw_char = func;
+    draw_func = func;
 }
 
-bool Software::FB_vga_text()
+static bool FB_vga_text()
 {
+    bool __return = false;
     Logging::info("[gpu/software]: checking VGA text FB...");
     static VGA_text::instance FB_vga_text_instance;
     if (FB_vga_text_instance.init)
     {
         Logging::info("[gpu/software]: using VGA text as primary FB");
         set_fb_helper(VGA_text::put_char);
+        __return = true;
     }
-    return FB_vga_text_instance.init;
+    return __return;
+}
+
+void Software::draw_char(const char &what)
+{
+    draw_func(what);
 }
 
 Software::Software()

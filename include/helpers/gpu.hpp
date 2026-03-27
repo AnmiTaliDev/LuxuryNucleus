@@ -7,7 +7,7 @@ namespace Helpers
             class instance
             {
                 public:
-                bool *init;
+                bool init = false;
                 instance();
             };
             extern void draw_char(const char&);

@@ -1,3 +1,4 @@
+.intel_syntax noprefix
 .set MULTIBOOT2_MAGIC, 0xE85250D6
 .set MULTIBOOT2_ARCH,  0
 

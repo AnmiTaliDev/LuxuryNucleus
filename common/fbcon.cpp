@@ -26,10 +26,9 @@ static void choose_primary_gpu()
 void fbcon::init()
 {
     Logging::info("[fbcon]: initializing, choosing GPU helper...");
-    choose_primary_gpu();
-    if (fb_func != nullptr)
+    if (choose_primary_gpu(); fb_func != nullptr)
     {
-        Logging::switch_write_char_func();
+        switch_write_char_func();
     }
     else
         Logging::warn("[fbcon]: no active GPU was detected");

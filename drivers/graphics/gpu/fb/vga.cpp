@@ -5,11 +5,10 @@ VGA text framebuffer driver for legacy BIOS
 #include <drivers/bda.hpp>
 #include <logging.hpp>
 #include <library/libfb.hpp>
-#include <misc/vga_colors.hpp>
 #include <mmio/get_ptr.hpp>
+#include <mmio/alloc.hpp>
 #include <drivers/graphics/gpu/fb/vga.hpp>
 using namespace Drivers::Graphics::FB::VGA;
-using namespace Miscellaneous::FB::VGA;
 
 #define vga_text_width  80
 #define vga_text_height 25
@@ -35,7 +34,7 @@ void vga_text_fb::fill_with_zeros()
     vga_text_libfb->_rst_col();
 }
 
-void vga_text_fb::set_attr(const unsigned short &foreground, const unsigned short &background, const bool &blink)
+void vga_text_fb::set_attr(const enum vga_colors &foreground, const enum vga_colors &background, const bool &blink)
 {
     attribute = (foreground | background << 4 | blink << 7) << 8;
 }
@@ -84,41 +83,40 @@ void vga_text_fb::put_char(const unsigned short &what)
 
 vga_text_fb::vga_text_fb()
 {
-    enum BDA::video_type videotype = BDA::video_type();
-    if (videotype != BDA::VIDEO_TYPE_NONE)
+    Logging::info("[vga/text]: checking text mode FB size...");
+    static unsigned long long size = ullint();
+    while (vga_text_buffer[size])
+        size++;
+    if (size > 1)
     {
-        switch (videotype)
+        enum BDA::video_type videotype = BDA::video_type();
+        if (videotype != BDA::VIDEO_TYPE_NONE)
         {
-            case BDA::VIDEO_TYPE_COLOUR:
-                Logging::info("[vga/text]: detected colour video type");
-                vga_text_buffer = ushort_ptr(mmio_addr_vga_text_fb_colour);
-                break;
-            case BDA::VIDEO_TYPE_MONOCHROME:
-                Logging::info("[vga/text]: detected monochrome video type");
-                vga_text_buffer = ushort_ptr(mmio_addr_vga_text_fb_monochrome);
-                break;
-            default:
-                Logging::err("[vga/text]: failed to get video type");
-                return;
+            switch (videotype)
+            {
+                case BDA::VIDEO_TYPE_COLOUR:
+                    Logging::info("[vga/text]: detected colour video type");
+                    vga_text_buffer = ushort_ptr(mmio_addr_vga_text_fb_colour);
+                    break;
+                case BDA::VIDEO_TYPE_MONOCHROME:
+                    Logging::info("[vga/text]: detected monochrome video type");
+                    vga_text_buffer = ushort_ptr(mmio_addr_vga_text_fb_monochrome);
+                    break;
+                default:
+                    Logging::err("[vga/text]: failed to get video type");
+                    return;
+            }
         }
-        Logging::info("[vga/text]: checking text mode fb size...");
-        unsigned size = 0;
-        while (vga_text_buffer[size])
-            size++;
-        if (size == 16388)
-        {
-            Logging::info("[vga/text]: initializing fb...");
-            static Library::libfb::libfb __vga_text_libfb(vga_text_width,vga_text_height);
-            vga_text_libfb = &__vga_text_libfb;
-            static unsigned short __scroll_row_buff[vga_text_width];
-            vga_text_scroll_buffer = __scroll_row_buff;
-            /*unsigned char __double_buff[16388];
-            double_buffer = __double_buff;*/
-            clean();
-            init = true;
-        }
-        else if (size == 0)
-            Logging::warn("[vga/text]: no text fb is allocated");
-        else Logging::err("[vga/text]: invalid size");
+        static Library::libfb::libfb __vga_text_libfb(vga_text_width,vga_text_height);
+        vga_text_libfb = &__vga_text_libfb;
+        static unsigned short __scroll_row_buff[vga_text_width];
+        vga_text_scroll_buffer = __scroll_row_buff;
+        /*unsigned char __double_buff[16388];
+        double_buffer = __double_buff;*/
+        clean();
+        init = true;
     }
+    else if (size == 0)
+        Logging::warn("[vga/text]: no text fb is allocated");
+    else Logging::err("[vga/text]: invalid size");
 }

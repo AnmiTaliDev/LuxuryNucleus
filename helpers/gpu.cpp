@@ -4,13 +4,13 @@
 using namespace Drivers::Graphics::GPU;
 using namespace Helpers::GPU;
 
-Software *GPU_software_instance = nullptr;
+static Software *GPU_software_instance = nullptr;
 SoftwareAccel::instance::instance()
 {
     Logging::info("[helpers/gpu]: initializing CPU-based render driver...");
     static Software gpu_software;
     GPU_software_instance = &gpu_software;
-    init = &GPU_software_instance->init;
+    init = GPU_software_instance->init;
 }
 
 void SoftwareAccel::draw_char(const char &what)
