@@ -7,16 +7,16 @@ constexpr const char *info_prefix = "<*> ";
 constexpr const char *warn_prefix = "<!> ";
 constexpr const char *err_prefix  = "<E> ";
 
-volatile unsigned char *buffer;
+char *buffer;
 unsigned long long buffer_size = 0;
 
-static void __write_char_buffer_only(const char &what)
+void __write_char_buffer_only(const char &what)
 {
     buffer[buffer_size] = what;
     buffer_size++;
 }
 
-static void __write_char_with_fbcon(const char &what)
+void __write_char_with_fbcon(const char &what)
 {
     __write_char_buffer_only(what);
     fbcon::fb_func(what);
@@ -26,9 +26,9 @@ void (*write_char)(const char&) = nullptr;
 
 void Logging::init()
 {
-    buffer = asciiz(100);
+    buffer = asciiz(10000);
     write_char = __write_char_buffer_only;
-    info("Initialized logger with 100 bytes of buffer");
+    info("Initialized logger with 10000 bytes of buffer");
 }
 
 void fbcon::switch_write_char_func()
@@ -38,7 +38,7 @@ void fbcon::switch_write_char_func()
     write_char = __write_char_with_fbcon;
 }
 
-static void write_str(const char *str)
+void write_str(const char *str)
 {
     unsigned len = 0;
     while (str[len])
@@ -48,7 +48,7 @@ static void write_str(const char *str)
     }
 }
 
-static void write_line(const char *&str)
+void write_line(const char *&str)
 {
     write_str(str);
     write_char('\n');

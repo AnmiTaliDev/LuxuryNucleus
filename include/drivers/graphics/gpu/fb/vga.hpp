@@ -13,8 +13,8 @@ namespace Drivers
                 {
                     public:
                     bool init = false;
-                    unsigned short attribute;
-                    void put_entry(const unsigned short &);
+                    unsigned short attribute, X, Y;
+                    void put_entry(const unsigned short);
                     void put_char(const unsigned short &);
                     void set_attr(const enum vga_colors &, const enum vga_colors &, const bool &);
                     void scroll();

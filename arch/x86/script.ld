@@ -8,16 +8,17 @@ SECTIONS {
         *(.text)
     }
 
-    .bss : {
-        *(.bss)
-    }
-
     .rodata : {
         *(.rodata)
     }
 
     .data : {
         *(.data)
+    }
+
+    .bss : {
+        *(COMMON)
+        *(.bss)
     }
     
     nkernel_end = .;
