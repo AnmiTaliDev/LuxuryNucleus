@@ -1,5 +1,5 @@
 namespace fbcon
 {
-    extern void (*fb_func)(const char&);
+    extern void (*draw_char_gpu_func)(const volatile char&);
     extern void switch_write_char_func();
 };

@@ -17,17 +17,13 @@ namespace Drivers
                     void put_entry(const unsigned short);
                     void put_char(const unsigned short &);
                     void set_attr(const enum vga_colors &, const enum vga_colors &, const bool &);
+                    void enable_cursor(const unsigned char &high_scanline, const unsigned char &low_scanline);
+                    void disable_cursor();
                     void scroll();
                     void fill_with_zeros();
                     void clean();
                     vga_text_fb();
                 };
-                /*class vga_graphics_fb
-                {
-                    public:
-                    bool init = false;
-                    unsigned column, row;
-                };*/
             }
         }
     }

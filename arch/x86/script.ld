@@ -1,25 +1,37 @@
-nkernel_start = 2M;
 ENTRY(_start)
 SECTIONS {
+    nkernel_start = 2M;
     . = nkernel_start;
 
-    .text : {
-        KEEP(*(.multiboot2))
+    .text :
+    {
+        *(.multiboot2)
         *(.text)
+        . = ALIGN(4096);
     }
 
-    .rodata : {
+    .rodata :
+    {
         *(.rodata)
+        . = ALIGN(4096);
     }
 
-    .data : {
+    .data :
+    {
         *(.data)
+        . = ALIGN(4096);
     }
 
-    .bss : {
-        *(COMMON)
+    .bss :
+    {
         *(.bss)
+        . = ALIGN(4096);
     }
-    
+
+    /DISCARD/ :
+    {
+        *(.eh_frame)
+    }
+
     nkernel_end = .;
 }

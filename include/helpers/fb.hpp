@@ -10,7 +10,7 @@ namespace Helpers
                 bool init = false;
                 instance();
             };
-            extern void put_char(const char&);
+            extern void put_char(const volatile char&);
         };
     }
 }

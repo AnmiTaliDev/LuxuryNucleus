@@ -7,7 +7,7 @@ constexpr const char *info_prefix = "<*> ";
 constexpr const char *warn_prefix = "<!> ";
 constexpr const char *err_prefix  = "<E> ";
 
-char *buffer;
+volatile char *buffer;
 unsigned long long buffer_size = 0;
 
 void __write_char_buffer_only(const char &what)
@@ -19,33 +19,34 @@ void __write_char_buffer_only(const char &what)
 void __write_char_with_fbcon(const char &what)
 {
     __write_char_buffer_only(what);
-    fbcon::fb_func(what);
+    fbcon::draw_char_gpu_func(what);
 }
 
+bool Logging::inited;
 void (*write_char)(const char&) = nullptr;
 
 void Logging::init()
 {
-    buffer = asciiz(10000);
+    inited = MMIO::boolean();
+    inited = false;
+    buffer = MMIO::asciiz(1000);
     write_char = __write_char_buffer_only;
-    info("Initialized logger with 10000 bytes of buffer");
+    inited = true;
+    info("[logger] Initialized with 1000 bytes of buffer");
 }
 
 void fbcon::switch_write_char_func()
 {
-    for (unsigned long long len = ullint(); len != buffer_size; len++)
-        fb_func(buffer[len]);
+    for (unsigned long long len = 0; len != buffer_size; len++)
+        draw_char_gpu_func(buffer[len]);
     write_char = __write_char_with_fbcon;
+    Logging::info("[fbcon]: exported logger buffer to display");
 }
 
 void write_str(const char *str)
 {
-    unsigned len = 0;
-    while (str[len])
-    {
+    for (unsigned long long len = 0; str[len]; len++)
         write_char(str[len]);
-        len++;
-    }
 }
 
 void write_line(const char *&str)

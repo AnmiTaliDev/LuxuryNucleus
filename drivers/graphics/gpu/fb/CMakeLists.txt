@@ -1,1 +1,1 @@
-add_library(driver_fb_vga OBJECT vga.cpp)
+add_subdirectory(vga)

@@ -1,8 +1,11 @@
-#include <library/strmgr.hpp>
+#include <mmio/alloc.hpp>
+#include <library/strmgr/ports.hpp>
+#include <library/strmgr/strings.hpp>
+using namespace Library;
 
-void Library::strmgr::outb(unsigned short port, unsigned char value)
+void strmgr::outb(unsigned short port, unsigned char value)
 {
-    asm volatile
+    __asm__
     ( 
         "outb %b0, %w1"
         :
@@ -11,10 +14,10 @@ void Library::strmgr::outb(unsigned short port, unsigned char value)
     );
 }
 
-unsigned char Library::strmgr::inb(unsigned short port)
+unsigned char strmgr::inb(unsigned short port)
 {
     unsigned char data;
-    asm volatile
+    __asm__
     (
         "inb %w1, %b0"
         : "=a"(data)
@@ -23,62 +26,30 @@ unsigned char Library::strmgr::inb(unsigned short port)
     );
     return data;
 }
-/*
-char* Library::strmgr::itos(int integer)
+
+unsigned long long strmgr::size_of(volatile void *of_what)
 {
-    if (integer == 0) return "0";
-    bool negative = false;
-    if (integer < 0) negative = true;
-    char output[12], reversed[12];
-    unsigned index = 0, index2 = 0;
-    while (true)
-    {
-        switch (integer % 10)
-        {
-            case 0:
-                reversed[index] = '0';
-                break;
-            case 1:
-                reversed[index] = '1';
-                break;
-            case 2:
-                reversed[index] = '2';
-                break;
-            case 3:
-                reversed[index] = '3';
-                break;
-            case 4:
-                reversed[index] = '4';
-                break;
-            case 5:
-                reversed[index] = '5';
-                break;
-            case 6:
-                reversed[index] = '6';
-                break;
-            case 7:
-                reversed[index] = '7';
-                break;
-            case 8:
-                reversed[index] = '8';
-                break;
-            case 9:
-                reversed[index] = '9';
-                break;
-        }
-        integer = integer / 10;
-        if (integer == 0) break;
-        index++;
-    }
-    if (negative)
-    {
-        reversed[index] = '-';
-    } else index--;
-    while (index != 0)
-    {
-        output[index2] = reversed[index];
-        index2++; index--;
-    }
-    return output;
+    volatile unsigned char *ptr = reinterpret_cast<volatile unsigned char*>(of_what);
+    unsigned long long size = 0;
+    while (ptr[size])
+        size++;
+    return size;
 }
-*/
+
+void* strmgr::cat(const void *src, void *dst, 
+    const unsigned long long &src_size,
+    unsigned long long &dst_size)
+{
+    unsigned char *src_ptr = reinterpret_cast<unsigned char*>(&src),
+                  *dst_ptr = reinterpret_cast<unsigned char*>(dst),
+                  *new_str = reinterpret_cast<unsigned char*>(*MMIO::alloc(dst_size + src_size));
+    unsigned long long index = 0, len = 0;
+    for (len = 0; len != dst_size; len++)
+        new_str[len] = dst_ptr[len];
+    index = len;
+    for (len = 0; len != src_size; len++)
+        new_str[index] = src_ptr[len];
+    return reinterpret_cast<void*>(new_str);
+}
+
+ 
