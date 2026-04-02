@@ -16,8 +16,7 @@ void set_gpu_helper(void (*func)(const volatile char&)){
 void choose_primary_gpu()
 {
     // Software acceleration
-    SoftwareAccel::instance Helper_GPU_SoftwareAccel = SoftwareAccel::instance();
-    if (Helper_GPU_SoftwareAccel.init)
+    if (SoftwareAccel::instance().init)
     {
         Logging::info("[fbcon]: setting up software rendering...");
         set_gpu_helper(SoftwareAccel::draw_char);

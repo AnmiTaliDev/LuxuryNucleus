@@ -1,4 +1,5 @@
 #include <mmio/alloc.hpp>
+#include <library/strmgr/strings.hpp>
 #include <fbcon.hpp>
 #include <init/logging.hpp>
 #include <logging.hpp>
@@ -8,12 +9,15 @@ constexpr const char *warn_prefix = "<!> ";
 constexpr const char *err_prefix  = "<E> ";
 
 volatile char *buffer;
-unsigned long long buffer_size = 0;
+unsigned long long buffer_len = 0;
+constexpr unsigned long long buffer_size = 1001;
 
 void __write_char_buffer_only(const char &what)
 {
-    buffer[buffer_size] = what;
-    buffer_size++;
+    buffer[buffer_len] = what;
+    buffer_len++;
+    if (buffer_len == buffer_size)
+        Library::strmgr::clean_asciiz(buffer,buffer_size);
 }
 
 void __write_char_with_fbcon(const char &what)
@@ -22,22 +26,20 @@ void __write_char_with_fbcon(const char &what)
     fbcon::draw_char_gpu_func(what);
 }
 
-bool Logging::inited;
+bool Logging::inited = false;
 void (*write_char)(const char&) = nullptr;
 
 void Logging::init()
 {
-    inited = MMIO::boolean();
-    inited = false;
-    buffer = MMIO::asciiz(1000);
+    buffer = MMIO::asciiz(buffer_size);
     write_char = __write_char_buffer_only;
     inited = true;
-    info("[logger] Initialized with 1000 bytes of buffer");
+    info("[logger] Initialized with 1001 bytes of buffer");
 }
 
 void fbcon::switch_write_char_func()
 {
-    for (unsigned long long len = 0; len != buffer_size; len++)
+    for (unsigned long long len = 0; len != buffer_len; len++)
         draw_char_gpu_func(buffer[len]);
     write_char = __write_char_with_fbcon;
     Logging::info("[fbcon]: exported logger buffer to display");
