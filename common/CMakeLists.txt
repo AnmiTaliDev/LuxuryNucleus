@@ -1,5 +1,5 @@
+add_library(common_mmio OBJECT mmio.cpp)
 add_library(common_logging OBJECT logging.cpp)
 add_library(common_fbcon OBJECT fbcon.cpp)
-add_subdirectory(mmio)
 
-target_link_libraries(NucleusKernel PRIVATE common_logging common_fbcon)
+target_link_libraries(LuxuryNucleus PRIVATE common_mmio common_logging common_fbcon)

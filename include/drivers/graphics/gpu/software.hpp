@@ -4,13 +4,12 @@ namespace Drivers
     {
         namespace GPU
         {
-            class Software
+            namespace Software
             {
-                public:
-                bool init;
-                void draw_char(const volatile char &);
-                void draw_pixel(const volatile char &);
-                Software();
+                extern bool inited;
+                extern void draw_char(const volatile char &);
+                extern void draw_pixel(const volatile char &);
+                extern void init();
             };
         }
     }

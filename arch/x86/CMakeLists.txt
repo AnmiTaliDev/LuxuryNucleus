@@ -1,4 +1,4 @@
-add_library(arch_bootstrap OBJECT bootstrap.s)
-add_library(arch_multiboot2 OBJECT multiboot2.s)
+add_library(arch_multiboot2 OBJECT multiboot2.cpp)
+add_library(arch_stack OBJECT stack.S)
 
-target_link_libraries(NucleusKernel PRIVATE arch_bootstrap arch_multiboot2)
+target_link_libraries(LuxuryNucleus PRIVATE arch_multiboot2 arch_stack)

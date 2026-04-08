@@ -1,3 +1,0 @@
-add_library(common_mmio_alloc OBJECT alloc.cpp)
-
-target_link_libraries(NucleusKernel PRIVATE common_mmio_alloc)

@@ -3,15 +3,14 @@ The "software acceleration" GPU driver
 */
 
 #include <logging.hpp>
-#include <mmio/alloc.hpp>
-#include <helpers/fb.hpp>
-#include <helpers/gpu.hpp>
+#include <drivers/graphics/gpu/fb/vga/text.hpp>
 #include <drivers/graphics/gpu/software.hpp>
 using namespace Drivers::Graphics::GPU;
-using namespace Helpers::FB;
+using namespace Drivers::Graphics::FB;
 
 void (*draw_char_func)(const volatile char&) = nullptr;
 void (*draw_pixel_func)(const volatile char&) = nullptr;
+bool Software::inited = false;
 
 void set_fb_helper(void (*char_func)(const volatile char&), void (*pixel_func)(const volatile char&))
 {
@@ -24,8 +23,7 @@ void set_fb_helper(void (*char_func)(const volatile char&), void (*pixel_func)(c
 void FB_vga_text()
 {
     Logging::info("[gpu/software]: checking VGA text FB...");
-    VGA_text::instance Helper_FB_VGA_text = VGA_text::instance();
-    if (Helper_FB_VGA_text.init)
+    if (VGA_text::init(); VGA_text::inited)
     {
         Logging::info("[gpu/software]: using VGA text as primary FB");
         set_fb_helper(VGA_text::put_char,VGA_text::put_char);
@@ -42,11 +40,14 @@ void Software::draw_pixel(const volatile char &what)
     draw_pixel_func(what);
 }
 
-Software::Software()
+void Software::init()
 {
-    FB_vga_text();
-    init = draw_char_func != nullptr;
+    if (!inited)
+    {
+        FB_vga_text();
+        inited = draw_char_func != nullptr;
 
-    if (!init)
-        Logging::warn("[gpu/software]: no framebuffer is active!");
+        if (!inited)
+            Logging::warn("[gpu/software]: no framebuffer is active!");
+    }
 }

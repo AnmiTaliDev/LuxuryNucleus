@@ -4,133 +4,140 @@ VGA text framebuffer driver for legacy BIOS
 
 #include <drivers/bda.hpp>
 #include <logging.hpp>
-#include <mmio/alloc.hpp>
-#include <library/strmgr/ports.hpp>
-#include <library/strmgr/strings.hpp>
+#include <mmio/ports.hpp>
+#include <mmio/str.hpp>
+#include <library/strings.hpp>
+#include <library/libfb.hpp>
+#include <misc/vga_colors.hpp>
 #include <drivers/graphics/gpu/fb/vga/text.hpp>
-using namespace Drivers::Graphics::FB::VGA;
-using namespace Library::strmgr;
+using namespace Drivers::Graphics::FB;
+using namespace Miscellaneous::FB::VGA;
 
-#define vga_text_width  80
-#define vga_text_height 25
-
+const volatile unsigned short vga_register_port_1 = 0x3D4;
+const volatile unsigned short vga_register_port_2 = 0x3D5;
 #define mmio_addr_vga_text_fb_colour     0xB8000
 #define mmio_addr_vga_text_fb_monochrome 0xB0000
 #define mmio_addr_vga_graphics_fb        0xA0000
 
+const volatile unsigned long long vga_text_height = 25;
+const volatile unsigned long long vga_text_width = 80;
+
 //volatile unsigned char *const vga_graphics_buffer = ;
 volatile unsigned short *vga_text_buffer;
 volatile unsigned short *vga_text_scroll_buffer;
+Library::FB *vga_text_libfb;
+volatile unsigned short attribute;
 
-void vga_text_fb::put_entry(const unsigned short entry) 
+bool VGA_text::inited = false;
+
+void put_entry(const unsigned short entry) 
 {
-	vga_text_buffer[Y * vga_text_width + X] = entry | attribute;
+	vga_text_buffer[vga_text_libfb->TwoD()] = entry | attribute;
 }
 
-void vga_text_fb::fill_with_zeros()
+void fill_with_zeros()
 {
-    for (X = 0; X != vga_text_width; X++)
+    for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
 	    put_entry(0);
-    X = 0;
+    vga_text_libfb->column = 0;
 }
 
-void vga_text_fb::set_attr(const enum vga_colors &foreground, const enum vga_colors &background, const bool &blink)
+void set_attr(const enum vga_colors &foreground, const enum vga_colors &background, const bool &blink)
 {
     attribute = (foreground | background << 4 | blink << 7) << 8;
 }
 
-void vga_text_fb::enable_cursor(const unsigned char &high_scanline, const unsigned char &low_scanline)
+void enable_cursor(const unsigned char &high_scanline, const unsigned char &low_scanline)
 {
-    outb(0x3D4, 0x0A);
-	outb(0x3D5, (inb(0x3D5) & 0xC0) | high_scanline);
+    MMIO::Ports::outb(vga_register_port_1, 0x0A);
+	MMIO::Ports::outb(vga_register_port_2, (MMIO::Ports::inb(vga_register_port_2) & 0xC0) | high_scanline);
 
-	outb(0x3D4, 0x0B);
-	outb(0x3D5, (inb(0x3D5) & 0xE0) | low_scanline);
+	MMIO::Ports::outb(vga_register_port_1, 0x0B);
+	MMIO::Ports::outb(vga_register_port_2, (MMIO::Ports::inb(vga_register_port_2) & 0xE0) | low_scanline);
 }
 
-void vga_text_fb::disable_cursor()
+void disable_cursor()
 {
-	outb(0x3D4, 0x0A);
-	outb(0x3D5, 0x20);
+	MMIO::Ports::outb(vga_register_port_1, 0x0A);
+	MMIO::Ports::outb(vga_register_port_2, 0x20);
 }
 
-void vga_text_fb::clean()
+void clean()
 {
     set_attr(LIGHT_GRAY, BLACK, 0);
     disable_cursor();
-    for (Y = 0; Y != vga_text_height; Y++)
+    for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
         fill_with_zeros();
-    Y = 0;
+    vga_text_libfb->row = 0;
 }
 
-void vga_text_fb::scroll()
+void scroll()
 {
-    for (Y = 0; Y != vga_text_height; Y++)
+    for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
     {
-        for (X = 0; X != vga_text_width; X++)
-            vga_text_scroll_buffer[X] = vga_text_buffer[Y * vga_text_width + X];
-        Y--;
-        for (X = 0; X != vga_text_width; X++)
-            put_entry(vga_text_scroll_buffer[X]);
-        Y++;
+        volatile unsigned row = vga_text_libfb->TwoD_row();
+        for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
+            vga_text_scroll_buffer[vga_text_libfb->column] = vga_text_buffer[vga_text_libfb->TwoD_plus_column(row)];
+        vga_text_libfb->row--;
+        for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
+            put_entry(vga_text_scroll_buffer[vga_text_libfb->column]);
+        vga_text_libfb->row++;
     }
-    Y = 24;
+    vga_text_libfb->row = 24;
     fill_with_zeros();
 }
 
-void vga_text_fb::put_char(const unsigned short &what)
+void VGA_text::put_char(const volatile char &what)
 {
     switch (what)
     {
         case '\r': 
-            X = 0;
+            vga_text_libfb->column = 0;
             break;
         case '\n':
-            X = 0;
-            Y++;
+            vga_text_libfb->column = 0;
+            vga_text_libfb->row++;
             break;
         default:
             put_entry(what);
-            if (X++ == vga_text_width)
-            {
-                X = 0;
-                Y++;
-            }
+            vga_text_libfb->next_column();
             break;
     }
-	if (Y == vga_text_height) scroll();
+	if (vga_text_libfb->row == vga_text_libfb->height) scroll();
 }
 
-vga_text_fb::vga_text_fb()
+void VGA_text::init()
 {
-    Logging::info("[vga/text]: checking video type in BDA...");
-    enum BDA::video_type videotype = BDA::video_type();
-    if (videotype != BDA::VIDEO_TYPE_NONE)
+    if (!inited)
     {
-        switch (videotype)
+        Logging::info("[vga/text]: checking video type in BDA...");
+        enum BDA::video_type videotype = BDA::video_type();
+        if (videotype != BDA::VIDEO_TYPE_NONE)
         {
-            case BDA::VIDEO_TYPE_COLOUR:
-                Logging::info("[vga/text]: detected colour video type");
-                vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_colour);
-                break;
-            case BDA::VIDEO_TYPE_MONOCHROME:
-                Logging::info("[vga/text]: detected monochrome video type");
-                vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_monochrome);
-                break;
-            default:
-                Logging::err("[vga/text]: failed to get video type");
-                return;
+            switch (videotype)
+            {
+                case BDA::VIDEO_TYPE_COLOUR:
+                    Logging::info("[vga/text]: detected colour video type");
+                    vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_colour);
+                    break;
+                case BDA::VIDEO_TYPE_MONOCHROME:
+                    Logging::info("[vga/text]: detected monochrome video type");
+                    vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_monochrome);
+                    break;
+                default:
+                    Logging::err("[vga/text]: failed to get video type");
+                    return;
+            }
         }
+        Logging::info("[vga/text]: checking size...");
+        if (Library::Strings::length_of(vga_text_buffer) == 32775)
+        {
+            vga_text_scroll_buffer = MMIO::Strings::ushort_asciiz(vga_text_width);
+            *vga_text_libfb = Library::FB(vga_text_width,vga_text_height);
+            clean();
+            inited = true;
+        }
+        else
+            Logging::err("invalid size");
     }
-    Logging::info("[vga/text]: checking size...");
-    if (Library::strmgr::size_of(reinterpret_cast<volatile void*>(vga_text_buffer)) == 32775)
-    {
-        vga_text_scroll_buffer = MMIO::ushort_str(vga_text_width);
-        X = 0;
-        Y = 0;
-        clean();
-        init = true;
-    }
-    else
-        Logging::err("invalid size");
 }

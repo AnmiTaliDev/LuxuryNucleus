@@ -1,3 +1,3 @@
 add_library(driver_gpu_fb_vga_text OBJECT text.cpp)
 
-target_link_libraries(NucleusKernel PRIVATE driver_gpu_fb_vga_text)
+target_link_libraries(LuxuryNucleus PRIVATE driver_gpu_fb_vga_text)

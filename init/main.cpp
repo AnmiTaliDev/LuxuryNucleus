@@ -1,15 +1,21 @@
 #include <logging.hpp>
-#include <mmio/alloc.hpp>
-#include <library/strmgr/strings.hpp>
 #include <init/logging.hpp>
 #include <init/fbcon.hpp>
-void init_start() asm("init_start");
+void _start() __asm__("_start");
 
-void init_start()
+void _start()
 {
+    __asm__ volatile
+    (
+        "mov stack_top, esp"
+    );
     // init
     Logging::init();
     fbcon::init();
     // misc
     // end
+    __asm__ volatile
+    (
+        "cli\nhlt"
+    );
 }

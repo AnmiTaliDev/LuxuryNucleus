@@ -5,7 +5,7 @@ SECTIONS {
 
     .text :
     {
-        *(.multiboot2)
+        KEEP(*(.multiboot2))
         *(.text)
         . = ALIGN(4096);
     }
