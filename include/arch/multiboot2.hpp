@@ -1,15 +1,24 @@
-struct multiboot2_tag
+namespace Architecture
 {
-    unsigned short type;
-    unsigned short flags;
-    unsigned size;
-};
+    namespace x86
+    {
+        namespace Multiboot2
+        {
+            struct tag
+            {
+                unsigned short type;
+                unsigned short flags;
+                unsigned size;
+            };
 
-struct multiboot2_header
-{
-    unsigned magic;
-    unsigned architecture;
-    unsigned length;
-    unsigned checksum;
-    multiboot2_tag tags[];
-};
+            struct header
+            {
+                unsigned magic;
+                unsigned architecture;
+                unsigned length;
+                unsigned checksum;
+                tag tags[];
+            };
+        }
+    }
+}

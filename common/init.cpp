@@ -1,20 +1,25 @@
 #include <logging.hpp>
+#include <arch/stack.hpp>
 #include <init/logging.hpp>
 #include <init/fbcon.hpp>
-void _start() __asm__("_start");
+void _start() asm("_start");
 
 void _start()
 {
-    __asm__ volatile
+    asm
     (
-        "mov stack_top, esp"
+        "mov esp, %0"
+        : "=m" (Architecture::x86::stack_top)
+        :
+        : "memory"
     );
     // init
     Logging::init();
     fbcon::init();
     // misc
+    Logging::warn("dd");
     // end
-    __asm__ volatile
+    asm
     (
         "cli\nhlt"
     );

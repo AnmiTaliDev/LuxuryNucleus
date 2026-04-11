@@ -98,6 +98,9 @@ void VGA_text::put_char(const volatile char &what)
             vga_text_libfb->column = 0;
             vga_text_libfb->row++;
             break;
+        case '\t':
+            vga_text_libfb->column++;
+            break;
         default:
             put_entry(what);
             vga_text_libfb->next_column();
@@ -111,16 +114,16 @@ void VGA_text::init()
     if (!inited)
     {
         Logging::info("[vga/text]: checking video type in BDA...");
-        enum BDA::video_type videotype = BDA::video_type();
-        if (videotype != BDA::VIDEO_TYPE_NONE)
+        enum BDA::vga_display_type type = BDA::get_vga_display_type();
+        if (type != BDA::vga_display_type::NONE)
         {
-            switch (videotype)
+            switch (type)
             {
-                case BDA::VIDEO_TYPE_COLOUR:
+                case BDA::vga_display_type::COLOUR:
                     Logging::info("[vga/text]: detected colour video type");
                     vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_colour);
                     break;
-                case BDA::VIDEO_TYPE_MONOCHROME:
+                case BDA::vga_display_type::MONOCHROME:
                     Logging::info("[vga/text]: detected monochrome video type");
                     vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_monochrome);
                     break;
@@ -129,6 +132,8 @@ void VGA_text::init()
                     return;
             }
         }
+        else
+            return;
         Logging::info("[vga/text]: checking size...");
         if (Library::Strings::length_of(vga_text_buffer) == 32775)
         {

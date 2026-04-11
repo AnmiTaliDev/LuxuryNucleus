@@ -1,10 +1,10 @@
 namespace BDA
 {
-    enum video_type
+    enum vga_display_type
     {
-        VIDEO_TYPE_NONE = 0x00,
-        VIDEO_TYPE_COLOUR = 0x20,
-        VIDEO_TYPE_MONOCHROME = 0x30,
+        NONE = 0x00,
+        COLOUR = 0x20,
+        MONOCHROME = 0x30,
     };
-    extern enum video_type video_type();
+    extern enum vga_display_type get_vga_display_type();
 }

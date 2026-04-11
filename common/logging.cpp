@@ -42,7 +42,7 @@ void fbcon::switch_write_char_func()
     for (unsigned long long len = 0; len != buffer_len; len++)
         draw_char_gpu_func(buffer[len]);
     write_char = __write_char_with_fbcon;
-    Logging::info("[fbcon & logger]: exported logs buffer to display");
+    Logging::info("[fbcon/logger]: exported logs buffer to display");
 }
 
 void write_str(const volatile char *str)

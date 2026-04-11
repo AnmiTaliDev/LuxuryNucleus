@@ -17,7 +17,7 @@ elseif(arch STREQUAL "x86")
 endif()
 
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/arch/${arch}/script.ld")
-add_compile_options(-Wall -Wextra -Werror -O0 -ffreestanding -fno-PIC -nostdlib -fno-PIC -fno-signed-char -funsigned-char -m32 -masm=intel -mno-red-zone)
+add_compile_options(-Wall -Wextra -Werror -O0 -ffreestanding -fno-PIC -nostdlib -fno-PIC -fno-signed-char -funsigned-char -m32)
 add_link_options(-T${LINKER_SCRIPT} -nostdlib -no-pie -O0 -m32)
 include_directories("${CMAKE_SOURCE_DIR}/include")
 
@@ -30,5 +30,4 @@ add_custom_command(TARGET LuxuryNucleus POST_BUILD COMMAND qemu-system-x86_64 -e
 add_subdirectory(arch)
 add_subdirectory(library)
 add_subdirectory(drivers)
-add_subdirectory(init)
 add_subdirectory(common)
