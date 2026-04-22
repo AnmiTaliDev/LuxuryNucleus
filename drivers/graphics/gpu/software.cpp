@@ -2,35 +2,35 @@
 The "software acceleration" GPU driver
 */
 
-#include <logging.hpp>
-#include <drivers/graphics/gpu/fb/vga/text.hpp>
-#include <drivers/graphics/gpu/software.hpp>
-using namespace Drivers::Graphics::GPU;
-using namespace Drivers::Graphics::FB;
+#include <debug/logging.hpp>
+#include "fb/vga.hpp"
+#include "software.hpp"
+using namespace Drivers::Graphics;
 
-void (*Software::draw_char)(const volatile char &) = nullptr;
-void (*Software::draw_pixel)(const volatile char &) = nullptr;
-bool Software::inited = false;
+void (*GPU::Software::draw_char)(const volatile char &) = nullptr;
+void (*GPU::Software::draw_pixel)(const volatile char &) = nullptr;
+bool GPU::Software::inited = false;
 
-void set_fb_helper(void (*char_func)(const volatile char&), void (*pixel_func)(const volatile char&))
+void set_fb_func(void (*const char_func)(const volatile char&), void (*const pixel_func)(const volatile char&))
 {
     Logging::info("[gpu/software]: updating framebuffer helper...");
     if (char_func == pixel_func)
         Logging::warn("[gpu/software]: this FB supports only text characters!");
-    Software::draw_char = char_func; Software::draw_pixel = pixel_func;
+    GPU::Software::draw_char = char_func;
+    GPU::Software::draw_pixel = pixel_func;
 }
 
 void FB_vga_text()
 {
     Logging::info("[gpu/software]: checking VGA text FB...");
-    if (VGA_text::init(); VGA_text::inited)
+    if (FB::VGA_text::init(); FB::VGA_text::inited)
     {
         Logging::info("[gpu/software]: using VGA text as primary FB");
-        set_fb_helper(VGA_text::put_char,VGA_text::put_char);
+        set_fb_func(FB::VGA_text::put_char,FB::VGA_text::put_char);
     }
 }
 
-void Software::init()
+void GPU::Software::init()
 {
     if (!inited)
     {

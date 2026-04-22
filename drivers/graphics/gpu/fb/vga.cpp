@@ -2,25 +2,26 @@
 VGA text framebuffer driver for legacy BIOS
 */
 
-#include <drivers/bda.hpp>
-#include <logging.hpp>
-#include <mmio/ports.hpp>
-#include <mmio/str.hpp>
+#include <drivers/misc/bda.hpp>
+#include <debug/logging.hpp>
+#include <mm/io/port.hpp>
+#include <mm/alloc.hpp>
 #include <library/strings.hpp>
 #include <library/libfb.hpp>
 #include <misc/vga_colors.hpp>
-#include <drivers/graphics/gpu/fb/vga/text.hpp>
+#include "vga.hpp"
+using namespace MM::IO;
 using namespace Drivers::Graphics::FB;
 using namespace Miscellaneous::FB::VGA;
+using namespace Library;
 
-const volatile unsigned short vga_register_port_1 = 0x3D4;
-const volatile unsigned short vga_register_port_2 = 0x3D5;
+const volatile unsigned short pmio_addr_vga_register_port_1 = 0x3D4;
+const volatile unsigned short pmio_addr_vga_register_port_2 = 0x3D5;
 #define mmio_addr_vga_text_fb_colour     0xB8000
 #define mmio_addr_vga_text_fb_monochrome 0xB0000
 #define mmio_addr_vga_graphics_fb        0xA0000
-
-const volatile unsigned long long vga_text_height = 25;
-const volatile unsigned long long vga_text_width = 80;
+const volatile unsigned vga_text_height = 25;
+const volatile unsigned vga_text_width = 80;
 
 //volatile unsigned char *const vga_graphics_buffer = ;
 volatile unsigned short *vga_text_buffer;
@@ -49,17 +50,17 @@ void set_attr(const enum vga_colors &foreground, const enum vga_colors &backgrou
 
 void enable_cursor(const unsigned char &high_scanline, const unsigned char &low_scanline)
 {
-    MMIO::Ports::outb(vga_register_port_1, 0x0A);
-	MMIO::Ports::outb(vga_register_port_2, (MMIO::Ports::inb(vga_register_port_2) & 0xC0) | high_scanline);
+    Ports::write(pmio_addr_vga_register_port_1, 0x0A);
+	Ports::write(pmio_addr_vga_register_port_2, (Ports::read(pmio_addr_vga_register_port_2) & 0xC0) | high_scanline);
 
-	MMIO::Ports::outb(vga_register_port_1, 0x0B);
-	MMIO::Ports::outb(vga_register_port_2, (MMIO::Ports::inb(vga_register_port_2) & 0xE0) | low_scanline);
+	Ports::write(pmio_addr_vga_register_port_1, 0x0B);
+	Ports::write(pmio_addr_vga_register_port_2, (Ports::read(pmio_addr_vga_register_port_2) & 0xE0) | low_scanline);
 }
 
 void disable_cursor()
 {
-	MMIO::Ports::outb(vga_register_port_1, 0x0A);
-	MMIO::Ports::outb(vga_register_port_2, 0x20);
+	Ports::write(pmio_addr_vga_register_port_1, 0x0A);
+	Ports::write(pmio_addr_vga_register_port_2, 0x20);
 }
 
 void clean()
@@ -115,29 +116,27 @@ void VGA_text::init()
     {
         Logging::info("[vga/text]: checking video type in BDA...");
         enum BDA::vga_display_type type = BDA::get_vga_display_type();
-        if (type != BDA::vga_display_type::NONE)
+        switch (type)
         {
-            switch (type)
-            {
-                case BDA::vga_display_type::COLOUR:
-                    Logging::info("[vga/text]: detected colour video type");
-                    vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_colour);
-                    break;
-                case BDA::vga_display_type::MONOCHROME:
-                    Logging::info("[vga/text]: detected monochrome video type");
-                    vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_monochrome);
-                    break;
-                default:
-                    Logging::err("[vga/text]: failed to get video type");
-                    return;
-            }
+            case BDA::vga_display_type::COLOUR:
+                Logging::info("[vga/text]: detected colour video type");
+                vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_colour);
+                break;
+            case BDA::vga_display_type::MONOCHROME:
+                Logging::info("[vga/text]: detected monochrome video type");
+                vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_monochrome);
+                break;
+            case BDA::vga_display_type::NONE:
+                Logging::warn("[vga/text]: video display is not present.");
+                return;
+            default:
+                Logging::err("[vga/text]: failed to get video type");
+                return;
         }
-        else
-            return;
         Logging::info("[vga/text]: checking size...");
         if (Library::Strings::length_of(vga_text_buffer) == 32775)
         {
-            vga_text_scroll_buffer = MMIO::Strings::ushort_asciiz(vga_text_width);
+            vga_text_scroll_buffer = reinterpret_cast<volatile unsigned short*>(MM::alloc(vga_text_width));
             *vga_text_libfb = Library::FB(vga_text_width,vga_text_height);
             clean();
             inited = true;

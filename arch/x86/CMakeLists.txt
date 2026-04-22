@@ -1,4 +1,8 @@
+add_library(arch_boot OBJECT boot.S)
+target_link_libraries(LuxuryNucleus PRIVATE arch_boot)
 add_library(arch_multiboot2 OBJECT multiboot2.cpp)
-add_library(arch_stack OBJECT stack.cpp)
-
-target_link_libraries(LuxuryNucleus PRIVATE arch_multiboot2 arch_stack)
+target_link_libraries(LuxuryNucleus PRIVATE arch_multiboot2)
+add_library(arch_stack OBJECT stack.S)
+target_link_libraries(LuxuryNucleus PRIVATE arch_stack)
+add_library(arch_pmio OBJECT pmio.cpp)
+target_link_libraries(LuxuryNucleus PRIVATE arch_pmio)

@@ -1,37 +1,40 @@
-ENTRY(_start)
+ENTRY(kernel_init_boot)
+mmio_addr_alloc_kernel_start = 2M;
 SECTIONS {
-    nkernel_start = 2M;
-    . = nkernel_start;
+    . = mmio_addr_alloc_kernel_start;
 
     .text :
     {
         KEEP(*(.multiboot2))
+        mmio_addr_alloc_text_start = .;
         *(.text)
-        . = ALIGN(4096);
-    }
-
-    .rodata :
-    {
-        *(.rodata)
-        . = ALIGN(4096);
-    }
-
-    .data :
-    {
-        *(.data)
+        mmio_addr_alloc_text_end = .;
         . = ALIGN(4096);
     }
 
     .bss :
     {
+        mmio_addr_alloc_bss_start = .;
         *(.bss)
+        mmio_addr_alloc_bss_end = .;
         . = ALIGN(4096);
     }
 
-    /DISCARD/ :
+    .rodata :
     {
-        *(.eh_frame)
+        mmio_addr_alloc_rodata_start = .;
+        *(.rodata)
+        mmio_addr_alloc_rodata_end = .;
+        . = ALIGN(4096);
     }
 
-    nkernel_end = .;
+    .data :
+    {
+        mmio_addr_alloc_data_start = .;
+        *(.data)
+        mmio_addr_alloc_data_end = .;
+        . = ALIGN(4096);
+    }
+
+    mmio_addr_alloc_kernel_end = .;
 }

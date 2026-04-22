@@ -1,0 +1,2 @@
+add_library(debug_logging OBJECT logging.cpp)
+target_link_libraries(LuxuryNucleus PRIVATE debug_logging)

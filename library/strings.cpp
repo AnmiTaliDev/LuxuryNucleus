@@ -1,44 +1,60 @@
-#include <mmio/str.hpp>
-#include <library/strings.hpp>
+#include <mm/alloc.hpp>
+#include "strings.hpp"
 using namespace Library;
 
-unsigned long long Strings::length_of(const volatile void *of_what)
+unsigned Strings::length_of(const volatile void *of_what)
 {
     const volatile unsigned char *ptr_str = reinterpret_cast<const volatile unsigned char*>(of_what);
-    unsigned long long len = 0;
+    unsigned len = 0;
     while (ptr_str[len])
         len++;
     return len;
 }
 
-void Strings::clean_asciiz(volatile void *ptr, const volatile unsigned long long &size)
+void Strings::clean_asciiz(volatile void *ptr, unsigned &index)
 {
     volatile unsigned char *ptr_str = reinterpret_cast<volatile unsigned char*>(ptr);
-    for (unsigned long long i = 0; i != size; i++)
-        ptr_str[i] = '\0';
+    while (index != 0)
+    {
+        ptr_str[index] = '\0';
+        index--;
+    }
 }
 
-constexpr static char itos[10] = {'0','1','2','3','4','5','6','7','8','9'};
-constexpr volatile unsigned long long str_size = 100;
-
-const volatile char *Strings::to_string(int integer)
+constexpr static char itos[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+const volatile char *Strings::to_string(int integer, bool hex)
 {
-    volatile char *reversed_str = MMIO::Strings::char_asciiz(str_size),
-                  *str          = MMIO::Strings::char_asciiz(str_size);
-    unsigned long long reversed_index = 0, index = 0;
+    volatile char *reversed_str = nullptr, *str = nullptr;
+    unsigned reversed_index = 0, index = 0, base, size_of_str = 1, int_for_size_evaluate = integer;
+
     if (integer < 0)
     {
         str[index] = '-';
         index++;
+        size_of_str += 1;
         integer = -integer;
     }
-    while (true)
+    if (hex)
     {
-        reversed_str[reversed_index] = itos[integer % 10];
+        base = 16;
+        str[index] = '0';
+        index += 1;
+        str[index] = 'x';
+        index += 1;
+        size_of_str += 2;
+    }
+    else
+        base = 10;
+
+    for (int_for_size_evaluate = integer; int_for_size_evaluate != 0; size_of_str++)
+        int_for_size_evaluate = int_for_size_evaluate / base;
+    str = reinterpret_cast<volatile char*>(MM::alloc(size_of_str));
+    reversed_str = reinterpret_cast<volatile char*>(MM::alloc(size_of_str));
+
+    for (; integer > 0; integer /= base)
+    {
+        reversed_str[reversed_index] = itos[integer % base];
         reversed_index++;
-        integer = integer / 10;
-        if (integer == 0)
-            break;
     }
     while (reversed_index != 0)
     {

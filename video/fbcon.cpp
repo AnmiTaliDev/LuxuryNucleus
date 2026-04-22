@@ -1,8 +1,8 @@
-#include <logging.hpp>
+#include <debug/logging.hpp>
 #include <drivers/graphics/gpu/software.hpp>
-#include <init/fbcon.hpp>
-#include <fbcon.hpp>
-using namespace Drivers::Graphics::GPU;
+#include <init/hooks/fbcon.hpp>
+#include "fbcon.hpp"
+using namespace Drivers::Graphics;
 
 //constexpr char log_prefix[10] = "[fbcon]: ";
 void (*fbcon::draw_char_gpu_func)(const volatile char&) = nullptr;
@@ -15,10 +15,10 @@ void set_gpu_helper(void (*func)(const volatile char&)){
 void choose_primary_gpu()
 {
     // Software acceleration
-    if (Software::init(); Software::inited)
+    if (GPU::Software::init(); GPU::Software::inited)
     {
         Logging::info("[fbcon]: setting up software rendering...");
-        set_gpu_helper(Software::draw_char);
+        set_gpu_helper(GPU::Software::draw_char);
     }
 }
 
