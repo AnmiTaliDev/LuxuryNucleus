@@ -4,6 +4,6 @@ namespace Library
     {
         extern unsigned length_of(const volatile void *of_what);
         extern void clean_asciiz(volatile void *ptr, unsigned &length);
-        extern const volatile char *to_string(int, bool hex);
+        extern volatile char *to_string(int, bool hex);
     }
 }

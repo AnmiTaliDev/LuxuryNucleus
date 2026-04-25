@@ -10,9 +10,9 @@ VGA text framebuffer driver for legacy BIOS
 #include <library/libfb.hpp>
 #include <misc/vga_colors.hpp>
 #include "vga.hpp"
-using namespace MM::IO;
 using namespace Drivers::Graphics::FB;
 using namespace Miscellaneous::FB::VGA;
+using namespace MM::IO;
 using namespace Library;
 
 const volatile unsigned short pmio_addr_vga_register_port_1 = 0x3D4;
@@ -80,6 +80,7 @@ void scroll()
         for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
             vga_text_scroll_buffer[vga_text_libfb->column] = vga_text_buffer[vga_text_libfb->TwoD_plus_column(row)];
         vga_text_libfb->row--;
+
         for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
             put_entry(vga_text_scroll_buffer[vga_text_libfb->column]);
         vga_text_libfb->row++;
