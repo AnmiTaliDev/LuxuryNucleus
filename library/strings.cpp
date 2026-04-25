@@ -5,10 +5,10 @@ using namespace Library;
 unsigned Strings::length_of(const volatile void *of_what)
 {
     const volatile unsigned char *ptr_str = reinterpret_cast<const volatile unsigned char*>(of_what);
-    unsigned len = 0;
-    while (ptr_str[len])
-        len++;
-    return len;
+    unsigned index = 0;
+    while (ptr_str[index])
+        index++;
+    return index;
 }
 
 void Strings::clean_asciiz(volatile void *ptr, unsigned &index)
@@ -25,7 +25,7 @@ constexpr static volatile char itos[16] = {'0','1','2','3','4','5','6','7','8','
 volatile char *Strings::to_string(int integer, bool hex)
 {
     volatile char *reversed_str = nullptr, *str = nullptr;
-    unsigned reversed_index = 0, index = 0, base;
+    unsigned reversed_index = 0, index = 0, base, int_for_size_eval, size_of_str = 0;
 
     if (integer < 0)
     {
@@ -33,6 +33,7 @@ volatile char *Strings::to_string(int integer, bool hex)
         index++;
         integer = -integer;
     }
+
     if (hex)
     {
         base = 16;
@@ -44,16 +45,23 @@ volatile char *Strings::to_string(int integer, bool hex)
     else
         base = 10;
 
-    for (; integer > 0; integer /= base)
+    for (int_for_size_eval = integer; int_for_size_eval != 0; size_of_str++)
+        int_for_size_eval /= base;
+    reversed_str = reinterpret_cast<volatile char*>(MM::alloc(size_of_str));
+    str = reinterpret_cast<volatile char*>(MM::alloc(size_of_str));
+
+    for (; integer != 0; integer /= base)
     {
         reversed_str[reversed_index] = itos[integer % base];
         reversed_index++;
     }
+
     while (reversed_index != 0)
     {
         reversed_index--;
         str[index] = reversed_str[reversed_index];
         index++;
     }
+
     return str;
 }

@@ -1,6 +1,6 @@
 #include <library/strings.hpp>
 #include <mm/alloc.hpp>
-#include <video/fbcon.hpp>
+#include <graphics/fbcon.hpp>
 #include <init/hooks/logging.hpp>
 #include "logging.hpp"
 

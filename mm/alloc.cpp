@@ -1,7 +1,7 @@
 #include <arch/kernel_alloc.hpp>
 #include "alloc.hpp"
 
-unsigned index = reinterpret_cast<unsigned>(&mmio_addr_alloc_kernel_end);
+unsigned index = mmio_addr_alloc_kernel_end;
 volatile void *MM::alloc(const volatile unsigned &size)
 { // dynamic memory allocation
     volatile unsigned char *ptr = nullptr;

@@ -1,5 +1,5 @@
 #include <debug/logging.hpp>
-#include <drivers/graphics/gpu/software.hpp>
+#include <drivers/video/gpu/software.hpp>
 #include <init/hooks/fbcon.hpp>
 #include "fbcon.hpp"
 using namespace Drivers::Graphics;
