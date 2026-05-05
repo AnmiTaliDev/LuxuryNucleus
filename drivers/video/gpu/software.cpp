@@ -7,15 +7,14 @@ The "software acceleration" GPU driver
 #include "software.hpp"
 using namespace Drivers::Graphics;
 
-void (*GPU::Software::draw_char)(const volatile char &) = nullptr;
-void (*GPU::Software::draw_pixel)(const volatile char &) = nullptr;
+void (*volatile GPU::Software::draw_char)(const volatile char &) = nullptr;
+void (*volatile GPU::Software::draw_pixel)(const volatile char &) = nullptr;
 bool GPU::Software::inited = false;
 
 void set_fb_func(void (*const char_func)(const volatile char&), void (*const pixel_func)(const volatile char&))
 {
-    Logging::info("[gpu/software]: updating framebuffer helper...");
     if (char_func == pixel_func)
-        Logging::warn("[gpu/software]: this FB supports only text characters!");
+        Logging::warn("[gpu/software]: this FB supports only text entries!");
     GPU::Software::draw_char = char_func;
     GPU::Software::draw_pixel = pixel_func;
 }

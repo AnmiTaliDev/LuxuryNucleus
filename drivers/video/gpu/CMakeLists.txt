@@ -1,3 +1,3 @@
 add_library(driver_gpu_software OBJECT software.cpp)
-target_link_libraries(LuxuryNucleus PRIVATE driver_gpu_software)
+target_link_libraries(lnucleus PRIVATE driver_gpu_software)
 add_subdirectory(fb)

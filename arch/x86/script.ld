@@ -1,12 +1,16 @@
 SECTIONS {
-    ENTRY(kernel_init_boot)
+    ENTRY(init_boot)
     mmio_addr_alloc_kernel_start = 2M;
     . = mmio_addr_alloc_kernel_start;
 
-    .text :
+    .multiboot2 :
     {
         KEEP(*(.multiboot2))
-        mmio_addr_alloc_text_start = .;
+    }
+
+    .text :
+    {
+        mmio_addr_alloc_text_start = ABSOLUTE(.);
         *(.text .text.*)
         mmio_addr_alloc_text_end = ABSOLUTE(.);
         . = ALIGN(4096);

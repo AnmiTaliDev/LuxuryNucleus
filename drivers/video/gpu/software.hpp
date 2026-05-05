@@ -7,8 +7,8 @@ namespace Drivers
             namespace Software
             {
                 extern bool inited;
-                extern void (*draw_char)(const volatile char &);
-                extern void (*draw_pixel)(const volatile char &);
+                extern void (*volatile draw_char)(const volatile char &);
+                extern void (*volatile draw_pixel)(const volatile char &);
                 extern void init();
             };
         }

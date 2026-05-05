@@ -1,9 +1,11 @@
+.intel_syntax noprefix
+
 .section .text
-.global kernel_init_boot
+.global init_boot
 .code32
-kernel_init_boot:
-    call setup_stack_pointer
-//  ...
-    call kernel_init_general
+init_boot:
+    //call setup_stack_pointer
+    call init_prepare
     cli
-    hlt
+1:  hlt
+    jmp 1b

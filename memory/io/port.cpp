@@ -1,6 +1,6 @@
 #include <arch/x86/pmio.hpp>
 #include "port.hpp"
-using namespace MM::IO;
+using namespace Memory::IO;
 
 unsigned char Ports::read(const volatile unsigned short &port)
 {

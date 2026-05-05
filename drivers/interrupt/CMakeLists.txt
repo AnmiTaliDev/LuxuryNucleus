@@ -1,0 +1,2 @@
+add_library(driver_interrupt_nmi OBJECT nmi.cpp)
+target_link_libraries(lnucleus PRIVATE driver_interrupt_nmi)

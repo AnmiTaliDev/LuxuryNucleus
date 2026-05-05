@@ -1,22 +1,22 @@
 #include <library/strings.hpp>
-#include <mm/alloc.hpp>
+#include <memory/alloc.hpp>
 #include <graphics/fbcon.hpp>
 #include <init/hooks/logging.hpp>
 #include "logging.hpp"
 
 namespace LogPrefix
 {
-    constexpr static const volatile char *Info = "<*> ";
-    constexpr static const volatile char *Warn = "<!> ";
-    constexpr static const volatile char *Error  = "<E> ";
+    constexpr static const volatile char *const volatile Info = "<*> ";
+    constexpr static const volatile char *const volatile Warn = "<!> ";
+    constexpr static const volatile char *const volatile Error  = "<E> ";
 }
 
-volatile char *buffer;
+volatile char *volatile buffer;
 constexpr volatile unsigned buffer_size = 1001;
 unsigned buffer_len = 0;
 
 bool Logging::inited = false;
-void (*write_char)(const volatile char&) = nullptr;
+void (*volatile write_char)(const volatile char&) = nullptr;
 
 void __write_char_buffer_only(const volatile char &what)
 {
@@ -36,10 +36,12 @@ void Logging::init()
 {
     if (!inited)
     {
-        buffer = reinterpret_cast<volatile char*>(MM::alloc(buffer_size));
+        //volatile char buff[1001];
+        //buffer = buff;
+        buffer = static_cast<volatile char*>(Memory::alloc(buffer_size));
         write_char = __write_char_buffer_only;
         inited = true;
-        info("[logger]: Initialized with 1001 bytes of buffer");
+        info("[logger]: Initialized buffer of 1001 bytes.");
     }
 }
 
@@ -51,7 +53,7 @@ void fbcon::switch_write_char_func()
     Logging::info("exported logs buffer to display");
 }
 
-void write_str(const volatile char *const &str)
+void write_str(const volatile char *const volatile &str)
 {
     for (unsigned len = 0; str[len]; len++)
         write_char(str[len]);
@@ -64,20 +66,20 @@ void write_line(const volatile char *const &str)
     write_char(newline);
 }
 
-void Logging::info(const volatile char *const log)
+void Logging::info(const volatile char *const text)
 {
     write_str(LogPrefix::Info);
-    write_line(log);
+    write_line(text);
 }
 
-void Logging::warn(const volatile char *const log)
+void Logging::warn(const volatile char *const text)
 {
     write_str(LogPrefix::Warn);
-    write_line(log);
+    write_line(text);
 }
 
-void Logging::err(const volatile char *const log)
+void Logging::err(const volatile char *const text)
 {
     write_str(LogPrefix::Error);
-    write_line(log);
+    write_line(text);
 }

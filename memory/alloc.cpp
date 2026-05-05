@@ -2,15 +2,15 @@
 #include "alloc.hpp"
 
 unsigned index = mmio_addr_alloc_kernel_end;
-volatile void *MM::alloc(const volatile unsigned &size)
+volatile void *Memory::alloc(const volatile unsigned &size)
 { // dynamic memory allocation
-    volatile unsigned char *ptr = nullptr;
+    volatile unsigned char *volatile ptr = nullptr;
     if (size > 1)
     {
         while (true)
         {
             bool give_this = true;
-            ptr = reinterpret_cast<unsigned char*>(index);
+            ptr = reinterpret_cast<volatile unsigned char*>(index);
             for (unsigned i = 0; i != size; i++)
             {
                 if (ptr[i]) // != zero
@@ -22,7 +22,10 @@ volatile void *MM::alloc(const volatile unsigned &size)
                 }
             }
             if (give_this)
+            {
+                index += size;
                 break;
+            }
             else index++;
         }
     }

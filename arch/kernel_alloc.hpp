@@ -1,4 +1,4 @@
-extern unsigned &mmio_addr_alloc_kernel_start,
+extern unsigned mmio_addr_alloc_kernel_start,
                 mmio_addr_alloc_text_start,
                 mmio_addr_alloc_text_end,
                 mmio_addr_alloc_bss_start,

@@ -4,15 +4,15 @@ VGA text framebuffer driver for legacy BIOS
 
 #include <drivers/misc/bda.hpp>
 #include <debug/logging.hpp>
-#include <mm/io/port.hpp>
-#include <mm/alloc.hpp>
+#include <memory/io/port.hpp>
+#include <memory/alloc.hpp>
 #include <library/strings.hpp>
 #include <library/libfb.hpp>
 #include <misc/vga_colors.hpp>
 #include "vga.hpp"
 using namespace Drivers::Graphics::FB;
 using namespace Miscellaneous::FB::VGA;
-using namespace MM::IO;
+using namespace Memory::IO;
 using namespace Library;
 
 const volatile unsigned short pmio_addr_vga_register_port_1 = 0x3D4;
@@ -24,8 +24,8 @@ const volatile unsigned vga_text_height = 25;
 const volatile unsigned vga_text_width = 80;
 
 //volatile unsigned char *const vga_graphics_buffer = ;
-volatile unsigned short *vga_text_buffer;
-volatile unsigned short *vga_text_scroll_buffer;
+volatile unsigned short *volatile vga_text_buffer;
+volatile unsigned short *volatile vga_text_scroll_buffer;
 Library::FB *vga_text_libfb;
 volatile unsigned short attribute;
 
@@ -137,8 +137,8 @@ void VGA_text::init()
         Logging::info("[vga/text]: checking size...");
         if (Library::Strings::length_of(vga_text_buffer) == 32775)
         {
-            vga_text_scroll_buffer = reinterpret_cast<volatile unsigned short*>(MM::alloc(vga_text_width));
-            *vga_text_libfb = Library::FB(vga_text_width,vga_text_height);
+            vga_text_scroll_buffer = static_cast<volatile unsigned short*>(Memory::alloc(vga_text_width));
+            *vga_text_libfb = Library::FB{vga_text_width,vga_text_height};
             clean();
             inited = true;
         }

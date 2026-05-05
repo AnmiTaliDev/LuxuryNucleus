@@ -6,7 +6,8 @@ stack_bottom:
 .skip 16384
 stack_top:
 
+
 .section .text
 .global setup_stack_pointer
 setup_stack_pointer:
-    mov stack_top, esp
+    mov esp, offset stack_top
