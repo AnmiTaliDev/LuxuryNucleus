@@ -2,13 +2,13 @@
 VGA text framebuffer driver for legacy BIOS
 */
 
-#include <drivers/misc/bda.hpp>
+#include <drivers/bios/bda.hpp>
 #include <debug/logging.hpp>
 #include <memory/io/port.hpp>
 #include <memory/alloc.hpp>
 #include <library/strings.hpp>
 #include <library/libfb.hpp>
-#include <misc/vga_colors.hpp>
+#include "vga_colors.hpp"
 #include "vga.hpp"
 using namespace Drivers::Graphics::FB;
 using namespace Miscellaneous::FB::VGA;

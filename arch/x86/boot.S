@@ -1,11 +1,16 @@
 .intel_syntax noprefix
 
+.section .bss
+.align 16
+stack_bottom:
+.skip 16384
+stack_top:
+
+
 .section .text
 .global init_boot
 .code32
 init_boot:
-    //call setup_stack_pointer
+    mov esp, offset stack_top
     call init_prepare
-    cli
-1:  hlt
-    jmp 1b
+    hlt

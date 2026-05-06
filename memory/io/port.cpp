@@ -4,7 +4,7 @@ using namespace Memory::IO;
 
 unsigned char Ports::read(const volatile unsigned short &port)
 {
-    volatile unsigned char value = '\0';
+    volatile unsigned char value;
     Architecture::x86::in(port,value);
     return value;
 }

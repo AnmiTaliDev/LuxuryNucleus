@@ -8,12 +8,11 @@ SECTIONS {
         KEEP(*(.multiboot2))
     }
 
-    .text :
+    .text : ALIGN(4096)
     {
         mmio_addr_alloc_text_start = ABSOLUTE(.);
         *(.text .text.*)
         mmio_addr_alloc_text_end = ABSOLUTE(.);
-        . = ALIGN(4096);
     }
 
     .bss :

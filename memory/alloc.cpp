@@ -7,9 +7,10 @@ volatile void *Memory::alloc(const volatile unsigned &size)
     volatile unsigned char *volatile ptr = nullptr;
     if (size > 1)
     {
+        bool give_this;
         while (true)
         {
-            bool give_this = true;
+            give_this = true;
             ptr = reinterpret_cast<volatile unsigned char*>(index);
             for (unsigned i = 0; i != size; i++)
             {

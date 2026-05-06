@@ -23,7 +23,7 @@ void Strings::clean_asciiz(volatile void *const ptr, unsigned &index)
 
 constexpr static volatile char base_num[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 constexpr static unsigned size_of_str = 10;
-volatile char *Strings::to_string(int integer, bool hex)
+const volatile char *Strings::to_string(int integer, bool hex)
 {
     volatile char *volatile reversed_str = static_cast<volatile char*>(Memory::alloc(size_of_str)), 
                   *volatile          str = static_cast<volatile char*>(Memory::alloc(size_of_str));
@@ -35,6 +35,8 @@ volatile char *Strings::to_string(int integer, bool hex)
         index++;
         integer = -integer;
     }
+    else if (integer == 0)
+        return static_cast<const volatile char*>("0");
 
     if (hex)
     {
@@ -47,14 +49,15 @@ volatile char *Strings::to_string(int integer, bool hex)
     else
         base = 10;
 
-    for (; integer > 0; integer = integer / base)
+    for (; integer > 0; integer /= base)
     {
         reversed_str[reversed_index] = base_num[integer % base];
         reversed_index++;
     }
 
-    for (; reversed_index > 0; reversed_index--)
+    while (reversed_index > 0)
     {
+        reversed_index--;
         str[index] = reversed_str[reversed_index];
         index++;
     }

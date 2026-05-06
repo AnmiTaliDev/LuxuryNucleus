@@ -1,5 +1,5 @@
 #include <init/general.hpp>
-extern void init_prepare() asm("init_prepare");
+#include "prepare.hpp"
 
 void init_prepare()
 {

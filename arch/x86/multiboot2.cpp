@@ -1,19 +1,16 @@
 #include "multiboot2.hpp"
 using namespace Architecture::x86::Multiboot2;
 
-constexpr static unsigned multiboot2_magic = 0xE85250D6;
-constexpr static unsigned multiboot2_arch = 0;
-
 constexpr static tag tags_[]
 {
-    {.type = 0, .flags = 0, .size = 8}
+    {.type = 0, .flags = 0, .size = 8, .data = {}}
 };
 
 constexpr static volatile header __attribute__((section(".multiboot2"),used)) multiboot_hdr
 {
-    .magic = multiboot2_magic,
-    .architecture = multiboot2_arch,
+    .magic = 0xE85250D6,
+    .architecture = 0,
     .length = sizeof(header),
-    .checksum = static_cast<unsigned>(-(multiboot2_magic + multiboot2_arch + sizeof(header))),
+    .checksum = static_cast<unsigned>(-(0xE85250D6 + sizeof(header))),
     .tags = *tags_
 };

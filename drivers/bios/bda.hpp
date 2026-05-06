@@ -4,7 +4,7 @@ namespace Drivers
     {
         enum vga_display_type
         {
-            NONE = 0x0,
+            NONE = 0,
             COLOUR = 0x20,
             MONOCHROME = 0x30,
         };

@@ -1,16 +1,19 @@
 #include <memory/io/port.hpp>
+#include <library/integers.hpp>
 #include "register.hpp"
 #include "cmos.hpp"
+using namespace Library;
 using namespace Memory::IO;
 using namespace Drivers;
 
-unsigned short CMOS::pmio_cmos_index_register = 0x70,
-               CMOS::pmio_cmos_data_register = 0x71;
+volatile unsigned short CMOS::pmio_cmos_index_register = 0x70,
+                        CMOS::pmio_cmos_data_register = 0x71;
 
 enum
 {
-    second_reg = 0x00,
-    minute_reg = 0x02
+    second_reg = 0,
+    minute_reg = 0x2,
+    hours_reg = 0x4
 };
 
 unsigned char rtc_reg_get(const unsigned char &reg)
@@ -19,7 +22,12 @@ unsigned char rtc_reg_get(const unsigned char &reg)
     return Ports::read(CMOS::pmio_cmos_data_register);
 }
 
-unsigned CMOS::get_second()
+unsigned char CMOS::get_second()
 {
-    return rtc_reg_get(second_reg);
+    return Integers::bcd_to_bin(rtc_reg_get(second_reg));
+}
+
+unsigned char CMOS::get_minute()
+{
+    return Integers::bcd_to_bin(rtc_reg_get(minute_reg));
 }
