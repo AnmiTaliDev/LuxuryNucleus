@@ -4,17 +4,12 @@ namespace Architecture
     {
         namespace Multiboot2
         {
-            struct tag_data
-            {
-                unsigned data;
-            };
-
             struct tag
             {
                 const unsigned short type;
                 const unsigned short flags;
                 const unsigned size;
-                const tag_data data[];
+                const unsigned char data[];
             };
 
             struct header

@@ -16,7 +16,7 @@ enum
     hours_reg = 0x4
 };
 
-unsigned char rtc_reg_get(const unsigned char &reg)
+static unsigned char rtc_reg_get(const unsigned char &reg)
 {
     Ports::write(CMOS::pmio_cmos_index_register,reg);
     return Ports::read(CMOS::pmio_cmos_data_register);

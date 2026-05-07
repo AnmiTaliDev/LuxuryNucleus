@@ -29,17 +29,17 @@ elseif ( CMAKE_CXX_COMPILER STREQUAL "clang++" )
     add_compile_options(--target=${cross})
 endif()
 
-add_compile_options(-Wall -Wextra -O0 -ffreestanding -fno-PIC -fno-signed-char -funsigned-char -nostdlib)
+add_compile_options(-Wall -Wextra -O0 -nostdlib -ffreestanding -fno-PIC -no-pie -fno-pie -fno-signed-char -funsigned-char)
+add_link_options(-nostdlib -Wl,-no-pie --disable-reloc-section -Wl,-O0)
 
 string(FIND "${CXXFLAGS}" "-Werror" POSITION)
-if("${POSITION}" EQUAL -1)
+if ( "${POSITION}" EQUAL -1 )
     message(WARNING "LuxuryNucleus is in testing & development mode, not for production. Please, use -Werror option to make kernel stable.")
     set(CMAKE_BUILD_TYPE Debug)
 else()
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_link_options(-nostdlib -no-pie -z noexecstack -O0)
 include_directories("${CMAKE_SOURCE_DIR}")
 add_library(lnucleus STATIC)
 
@@ -51,5 +51,3 @@ add_subdirectory(memory)
 add_subdirectory(graphics)
 add_subdirectory(debug)
 add_subdirectory(misc)
-
-message(WARNING "${CFLAGS}")

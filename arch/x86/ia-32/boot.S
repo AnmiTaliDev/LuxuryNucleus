@@ -7,9 +7,7 @@ stack_bottom:
 stack_top:
 
 
-.section .text
 .global init_boot
-.code32
 init_boot:
     mov esp, offset stack_top
     call init_prepare

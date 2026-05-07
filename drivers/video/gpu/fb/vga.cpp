@@ -28,27 +28,26 @@ volatile unsigned short *volatile vga_text_buffer;
 volatile unsigned short *volatile vga_text_scroll_buffer;
 Library::FB *vga_text_libfb;
 volatile unsigned short attribute;
-
 bool VGA_text::inited = false;
 
-void put_entry(const unsigned short entry) 
+static void put_entry(const unsigned short entry) 
 {
 	vga_text_buffer[vga_text_libfb->TwoD()] = entry | attribute;
 }
 
-void fill_with_zeros()
+static void fill_with_zeros()
 {
     for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
 	    put_entry(0);
     vga_text_libfb->column = 0;
 }
 
-void set_attr(const enum vga_colors &foreground, const enum vga_colors &background, const bool &blink)
+static void set_attr(const enum vga_colors &foreground, const enum vga_colors &background, const bool &blink)
 {
     attribute = (foreground | background << 4 | blink << 7) << 8;
 }
 
-void enable_cursor(const unsigned char &high_scanline, const unsigned char &low_scanline)
+static void enable_cursor(const unsigned char &high_scanline, const unsigned char &low_scanline)
 {
     Ports::write(pmio_addr_vga_register_port_1, 0x0A);
 	Ports::write(pmio_addr_vga_register_port_2, (Ports::read(pmio_addr_vga_register_port_2) & 0xC0) | high_scanline);
@@ -57,13 +56,13 @@ void enable_cursor(const unsigned char &high_scanline, const unsigned char &low_
 	Ports::write(pmio_addr_vga_register_port_2, (Ports::read(pmio_addr_vga_register_port_2) & 0xE0) | low_scanline);
 }
 
-void disable_cursor()
+static void disable_cursor()
 {
 	Ports::write(pmio_addr_vga_register_port_1, 0x0A);
 	Ports::write(pmio_addr_vga_register_port_2, 0x20);
 }
 
-void clean()
+static void clean()
 {
     set_attr(LIGHT_GRAY, BLACK, 0);
     disable_cursor();
@@ -72,7 +71,7 @@ void clean()
     vga_text_libfb->row = 0;
 }
 
-void scroll()
+static void scroll()
 {
     for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
     {

@@ -11,7 +11,7 @@ void (*volatile GPU::Software::draw_char)(const volatile char &) = nullptr;
 void (*volatile GPU::Software::draw_pixel)(const volatile char &) = nullptr;
 bool GPU::Software::inited = false;
 
-void set_fb_func(void (*const char_func)(const volatile char&), void (*const pixel_func)(const volatile char&))
+static void set_fb_func(void (*const char_func)(const volatile char&), void (*const pixel_func)(const volatile char&))
 {
     if (char_func == pixel_func)
         Logging::warn("[gpu/software]: this FB supports only text entries!");
@@ -19,7 +19,7 @@ void set_fb_func(void (*const char_func)(const volatile char&), void (*const pix
     GPU::Software::draw_pixel = pixel_func;
 }
 
-void FB_vga_text()
+static void FB_vga_text()
 {
     Logging::info("[gpu/software]: checking VGA text FB...");
     if (FB::VGA_text::init(); FB::VGA_text::inited)

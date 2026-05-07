@@ -7,12 +7,12 @@ using namespace Drivers::Graphics;
 //constexpr char log_prefix[10] = "[fbcon]: ";
 void (*volatile fbcon::draw_char_gpu_func)(const volatile char&) = nullptr;
 
-void set_gpu_helper(void (*const func)(const volatile char&)){
+static void set_gpu_helper(void (*const func)(const volatile char&)){
     Logging::info("[fbcon]: setting primary GPU...");
     fbcon::draw_char_gpu_func = func;
 }
 
-void choose_primary_gpu()
+static void choose_primary_gpu()
 {
     // Software acceleration
     if (GPU::Software::init(); GPU::Software::inited)

@@ -11,12 +11,11 @@ namespace LogPrefix
     constexpr static const volatile char *const volatile Error  = "<E> ";
 }
 
+bool Logging::inited = false;
+void (*volatile write_char)(const volatile char&) = nullptr;
 volatile char *volatile buffer;
 constexpr volatile unsigned buffer_size = 1001;
 unsigned buffer_len = 0;
-
-bool Logging::inited = false;
-void (*volatile write_char)(const volatile char&) = nullptr;
 
 void __write_char_buffer_only(const volatile char &what)
 {
