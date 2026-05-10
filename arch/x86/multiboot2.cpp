@@ -7,8 +7,5 @@ constexpr static volatile header __attribute__((section(".multiboot2"),used)) mu
     .architecture = 0,
     .length = sizeof(header),
     .checksum = static_cast<unsigned>(-(0xE85250D6 + sizeof(header))),
-    .tags
-    {
-        {.type = 0, .flags = 0, .size = 8}
-    }
+
 };

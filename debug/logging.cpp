@@ -17,7 +17,7 @@ volatile char *volatile buffer;
 constexpr volatile unsigned buffer_size = 1001;
 unsigned buffer_len = 0;
 
-void __write_char_buffer_only(const volatile char &what)
+static void __write_char_buffer_only(const volatile char &what)
 {
     buffer[buffer_len] = what;
     buffer_len++;
@@ -25,7 +25,7 @@ void __write_char_buffer_only(const volatile char &what)
         Library::Strings::clean_asciiz(buffer,buffer_len);
 }
 
-void __write_char_with_fbcon(const volatile char &what)
+static void __write_char_with_fbcon(const volatile char &what)
 {
     __write_char_buffer_only(what);
     fbcon::draw_char_gpu_func(what);
@@ -52,14 +52,14 @@ void fbcon::switch_write_char_func()
     Logging::info("exported logs buffer to display");
 }
 
-void write_str(const volatile char *const volatile &str)
+static void write_str(const volatile char *const volatile &str)
 {
     for (unsigned len = 0; str[len]; len++)
         write_char(str[len]);
 }
 
 constexpr static volatile char newline = '\n';
-void write_line(const volatile char *const &str)
+static void write_line(const volatile char *const &str)
 {
     write_str(str);
     write_char(newline);

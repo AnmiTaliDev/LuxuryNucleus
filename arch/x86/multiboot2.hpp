@@ -18,7 +18,6 @@ namespace Architecture
                 const unsigned architecture;
                 const unsigned length;
                 const unsigned checksum;
-                const tag tags[];
             };
         }
     }
