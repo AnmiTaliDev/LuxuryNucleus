@@ -13,4 +13,4 @@ add_library(arch_multiboot2 OBJECT multiboot2.cpp)
 target_link_libraries(LuxuryNucleus PRIVATE arch_multiboot2)
 
 add_library(arch_pmio OBJECT pmio.cpp)
-target_link_libraries(lnucleus PRIVATE arch_pmio)
+target_link_libraries(LuxuryNucleus PRIVATE arch_pmio)

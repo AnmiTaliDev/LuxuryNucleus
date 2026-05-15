@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.3.1)
+cmake_minimum_required(VERSION 4.2.3)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 project(LuxuryNucleus LANGUAGES CXX ASM)
@@ -29,8 +29,9 @@ elseif ( CMAKE_CXX_COMPILER STREQUAL "clang++" )
     add_compile_options(--target=${cross})
 endif()
 
-add_compile_options(-Wall -Wextra -ffreestanding -nostdlib -fno-PIC -fno-PIE -static -fno-signed-char -funsigned-char -O0)
-add_link_options(-nostdlib -no-pie -static)
+add_compile_options(-Wall -Wextra -ffreestanding -nostdlib -static -fno-pic -fno-pie -no-pie -fno-signed-char -funsigned-char)
+add_link_options(-Wall -Wextra -ffreestanding -nostdlib -static -fno-pic -fno-pie -no-pie -fno-signed-char -funsigned-char -Wl,-nostdlib,-no-pie,-static)
+include_directories("${CMAKE_SOURCE_DIR}")
 
 string(FIND "${CXXFLAGS}" "-Werror" POSITION)
 if ( "${POSITION}" EQUAL -1 )
@@ -39,9 +40,6 @@ if ( "${POSITION}" EQUAL -1 )
 else()
     set(CMAKE_BUILD_TYPE Release)
 endif()
-
-include_directories("${CMAKE_SOURCE_DIR}")
-add_library(lnucleus STATIC)
 
 add_subdirectory(arch)
 add_subdirectory(library)

@@ -1,2 +1,2 @@
 add_library(misc_delay OBJECT delay.cpp)
-target_link_libraries(lnucleus PRIVATE misc_delay)
+target_link_libraries(LuxuryNucleus PRIVATE misc_delay)

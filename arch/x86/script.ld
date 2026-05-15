@@ -3,42 +3,34 @@ SECTIONS {
     mmio_addr_alloc_kernel_start = 2M;
     . = mmio_addr_alloc_kernel_start;
 
-    .multiboot2 :
+    .bss :
     {
-        KEEP(*(.multiboot2))
+        mmio_addr_alloc_bss_start = .;
+        *(.bss)
+        mmio_addr_alloc_bss_end = .;
     }
 
     .text :
     {
-        mmio_addr_alloc_text_start = ABSOLUTE(.);
-        *(.text .text.*)
-        mmio_addr_alloc_text_end = ABSOLUTE(.);
-        . = ALIGN(4096);
-    }
-
-    .bss :
-    {
-        mmio_addr_alloc_bss_start = ABSOLUTE(.);
-        *(.bss .bss.* COMMON)
-        mmio_addr_alloc_bss_end = ABSOLUTE(.);
-        . = ALIGN(4096);
+        KEEP(*(.multiboot2))
+        mmio_addr_alloc_text_start = .;
+        *(.text)
+        mmio_addr_alloc_text_end = .;
     }
 
     .rodata :
     {
-        mmio_addr_alloc_rodata_start = ABSOLUTE(.);
-        *(.rodata .rodata.*)
-        mmio_addr_alloc_rodata_end = ABSOLUTE(.);
-        . = ALIGN(4096);
+        mmio_addr_alloc_rodata_start = .;
+        *(.rodata)
+        mmio_addr_alloc_rodata_end = .;
     }
 
     .data :
     {
-        mmio_addr_alloc_data_start = ABSOLUTE(.);
-        *(.data .data.*)
-        mmio_addr_alloc_data_end = ABSOLUTE(.);
-        . = ALIGN(4096);
+        mmio_addr_alloc_data_start = .;
+        *(.data)
+        mmio_addr_alloc_data_end = .;
     }
 
-    mmio_addr_alloc_kernel_end = ABSOLUTE(.);
+    mmio_addr_alloc_kernel_end = .;
 }
