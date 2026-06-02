@@ -9,7 +9,7 @@ void FB::newline()
 
 void FB::next_column()
 {
-    if (column++ == width)
+    if (++column == width)
         newline();
 }
 

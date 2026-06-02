@@ -1,1 +1,0 @@
-extern void init_prepare() asm("init_prepare");

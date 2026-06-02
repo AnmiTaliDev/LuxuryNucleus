@@ -1,2 +1,2 @@
 add_library(driver_gpu_fb_vga OBJECT vga.cpp)
-target_link_libraries(LuxuryNucleus PRIVATE driver_gpu_fb_vga)
+target_link_libraries(lnucleus PRIVATE driver_gpu_fb_vga)

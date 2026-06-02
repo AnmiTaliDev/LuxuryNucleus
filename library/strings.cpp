@@ -64,3 +64,22 @@ const volatile char *Strings::to_string(int integer, bool hex)
 
     return str;
 }
+
+bool Strings::same(const volatile void *const first, const volatile void *const second, unsigned &size)
+{
+    const volatile char *const f_str = reinterpret_cast<const volatile char*>(first);
+    const volatile char *const s_str = reinterpret_cast<const volatile char*>(second);
+    bool same = true;
+    unsigned len = 0;
+
+    while (len != size)
+    {
+        if (f_str[len] == s_str[len]) len++;
+        else 
+        {
+            same = false;
+            break;
+        }
+    }
+    return same;
+}

@@ -2,7 +2,7 @@
 
 void Architecture::x86::out(const volatile unsigned short &port, const volatile unsigned char &data)
 {
-    asm
+    asm volatile
     (
         "out dx, al"
         :
@@ -12,7 +12,7 @@ void Architecture::x86::out(const volatile unsigned short &port, const volatile 
 
 void Architecture::x86::in(const volatile unsigned short &port, volatile unsigned char &data)
 {
-    asm
+    asm volatile
     (
         "in al, dx"
         : "=a" (data)

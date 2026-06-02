@@ -9,7 +9,6 @@ namespace Architecture
                 const unsigned short type;
                 const unsigned short flags;
                 const unsigned size;
-                const unsigned char data[];
             };
 
             struct header
@@ -23,3 +22,5 @@ namespace Architecture
         }
     }
 }
+
+#define TAG(TYPE, FLAGS, SIZE) {.type=TYPE,.flags=FLAGS,.size=SIZE}
