@@ -1,4 +1,4 @@
-#include <arch/kernel_alloc.hpp>
+#include <arch/alloc/kernel.hpp>
 #include "alloc.hpp"
 
 volatile unsigned char *index = reinterpret_cast<volatile unsigned char *>(mmio_addr_alloc_kernel_end);
@@ -21,11 +21,9 @@ volatile void *Memory::alloc(const volatile unsigned &size)
                     break;
                 }
             }
+            index += size;
             if (give_this)
-            {
-                index += size;
                 break;
-            }
         }
     }
     return ptr;

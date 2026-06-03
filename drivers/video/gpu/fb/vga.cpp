@@ -114,26 +114,26 @@ void VGA_text::init()
 {
     if (!inited)
     {
-        Logging::info("[vga/text]: checking video type in BDA...");
+        Debug::Logging::info("[vga/text]: checking video type in BDA...");
         enum BDA::vga_display_type type = BDA::get_vga_display_type();
         switch (type)
         {
             case BDA::vga_display_type::COLOUR:
-                Logging::info("[vga/text]: detected colour video type");
+                Debug::Logging::info("[vga/text]: detected colour video type");
                 vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_colour);
                 break;
             case BDA::vga_display_type::MONOCHROME:
-                Logging::info("[vga/text]: detected monochrome video type");
+                Debug::Logging::info("[vga/text]: detected monochrome video type");
                 vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_monochrome);
                 break;
             case BDA::vga_display_type::NONE:
-                Logging::warn("[vga/text]: video display is not present.");
+                Debug::Logging::warn("[vga/text]: video display is not present.");
                 return;
             default:
-                Logging::err("[vga/text]: failed to get video type");
+                Debug::Logging::err("[vga/text]: failed to get video type");
                 return;
         }
-        Logging::info("[vga/text]: checking size...");
+        Debug::Logging::info("[vga/text]: checking size...");
         if (Library::Strings::length_of(vga_text_buffer) == 32775)
         {
             vga_text_scroll_buffer = static_cast<volatile unsigned short*>(Memory::alloc(vga_text_width));
@@ -142,6 +142,6 @@ void VGA_text::init()
             inited = true;
         }
         else
-            Logging::err("invalid size");
+            Debug::Logging::err("invalid size");
     }
 }

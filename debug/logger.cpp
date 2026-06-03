@@ -1,10 +1,10 @@
 #include <library/strings.hpp>
 #include <memory/alloc.hpp>
 #include <graphics/fbcon.hpp>
-#include <init/services/service.hpp>
+#include <init/services/logger.hpp>
 #include "logging.hpp"
 using namespace Graphics::fbcon;
-using namespace Logging;
+using namespace Debug;
 
 namespace LogPrefix
 {
@@ -75,17 +75,15 @@ void Graphics::fbcon::switch_write_char_func()
     for (unsigned len = 0; len != buffer_len; ++len)
         draw_char_gpu_func(buffer[len]);
     write_char = __write_char_with_fbcon;
-    info("exported logs buffer to display");
+    Logging::info("exported logs buffer to display");
 }
 
-static void init()
+void Logging::init()
 {
     //volatile char buff[1001];
     //buffer = buff;
     buffer = static_cast<volatile char*>(Memory::alloc(buffer_size));
     write_char = __write_char_buffer_only;
     info = _info; warn = _warn; err = _err;
-    info("[logger]: Initialized buffer of 1001 bytes.");
+    info("[debug/logger]: Initialized buffer of 1001 bytes.");
 }
-
-INIT_SERVICE(init)
