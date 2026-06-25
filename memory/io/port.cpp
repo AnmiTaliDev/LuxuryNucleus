@@ -2,14 +2,14 @@
 #include "port.hpp"
 using namespace Memory::IO;
 
-unsigned char Ports::read(const volatile unsigned short &port)
+char Ports::read(const unsigned short &port)
 {
-    volatile unsigned char value;
+    char value;
     Architecture::x86::in(port,value);
     return value;
 }
 
-void Ports::write(const volatile unsigned short &port, const unsigned char value)
+void Ports::write(const unsigned short &port, const char value)
 {
     Architecture::x86::out(port,value);
 }

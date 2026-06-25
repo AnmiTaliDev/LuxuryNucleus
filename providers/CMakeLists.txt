@@ -1,0 +1,2 @@
+add_library(subsystem_providers OBJECT provider.cpp)
+target_link_libraries(lnucleus PRIVATE subsystem_providers)

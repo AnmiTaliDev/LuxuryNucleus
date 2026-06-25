@@ -1,30 +1,36 @@
 #include <arch/alloc/kernel.hpp>
 #include "alloc.hpp"
 
-volatile unsigned char *index = reinterpret_cast<volatile unsigned char *>(mmio_addr_alloc_kernel_end);
-volatile void *Memory::alloc(const volatile unsigned &size)
-{ // dynamic memory allocation
-    volatile unsigned char *ptr = nullptr;
+char *index = mmio_addr_alloc_kernel_end;
+
+void *Memory::malloc(const unsigned long long &size)
+{
+    char *ptr;
     if (size > 1)
     {
+        bool give_this; unsigned long long i;
         while (true)
         {
-            bool give_this = true;
+            give_this = true;
             ptr = index;
-            for (unsigned i = 0; i != size; ++i)
+            for (i = 0; i != size + 1; ++i)
             {
                 if (ptr[i]) // != zero
                     give_this = false;
                 else if (!give_this)
-                {
-                    ptr += i + 1;
                     break;
-                }
             }
-            index += size;
+            index += i;
             if (give_this)
                 break;
         }
     }
     return ptr;
+}
+
+void Memory::free(void *ptr, const unsigned long long &size)
+{
+    char *str = static_cast<char *>(ptr);
+    for (unsigned long long i = 0; i != size; i++)
+        str[i] = 0;
 }

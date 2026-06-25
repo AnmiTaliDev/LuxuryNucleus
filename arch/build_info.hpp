@@ -2,10 +2,10 @@ namespace Information
 {
     namespace Build
     {
-        extern const volatile char
-            *const volatile Architecture,
-            *const volatile ExecFileType,
-            *const volatile BuildDate = __DATE__,
-            *const volatile BuildTime = __TIME__;
+        extern const char
+            *const Architecture,
+            *const ExecFileType,
+            *const BuildDate = __DATE__,
+            *const BuildTime = __TIME__;
     }
 }

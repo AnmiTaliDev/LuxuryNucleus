@@ -1,17 +1,19 @@
-#include <library/strings.hpp>
-using namespace Library::Strings;
+#include <library/str_int.hpp>
+#include <memory/alloc.hpp>
+using namespace Library::Str_Int;
 
-volatile unsigned char *EPS = reinterpret_cast<unsigned char*>(0xF0000);
-namespace anchor_str
+char *EPS = reinterpret_cast<char *>(0xF0000);
+
+enum
 {
-    unsigned bit32_size = 4;
-    unsigned bit64_size = 5;
-}
+    bit32_size = 4,
+    bit64_size = 5
+};
 
 unsigned i, len;
-unsigned char checksum = 0;
+char checksum = 0;
 
-static bool chksum(unsigned char max_len)
+static bool chksum(char max_len)
 {
     for (i = 0; i != max_len; i++)
         checksum += EPS[i];
@@ -21,13 +23,13 @@ static bool chksum(unsigned char max_len)
 
 static bool check_eps()
 {
-    while (EPS != reinterpret_cast<unsigned char*>(0xFFFFF))
+    while (EPS != reinterpret_cast<char *>(0xFFFFF))
     {
 #if ARCH_CAP == 64
-        if (same(EPS,"_SM3_",anchor_str::bit64_size))
+        if (same(EPS,"_SM3_",bit64_size))
             if (chksum(EPS[5])) break;
 #endif
-        if (same(EPS,"_SM_",anchor_str::bit32_size))
+        if (same(EPS,"_SM_",bit32_size))
             if (chksum(EPS[4])) break;
         EPS += 16;
     }

@@ -8,13 +8,25 @@ stack_top:
 
 
 .section .text
+.global halt
+halt:
+    cli
+1:  hlt
+    jmp 1b
+
 .global init_boot
 .code32
 init_boot:
+    in al, 0x92
+    test al, 2
+    jnz after
+    or al, 2
+    and al, 0xFE
+    out 0x92, al
+    after:
 #if ARCH_CAP == 32
     mov esp, offset stack_top
+    call init_main
 #elif ARCH_CAP == 64
-    mov rsp, offset stack_top
+
 #endif
-    call init_prepare
-    hlt

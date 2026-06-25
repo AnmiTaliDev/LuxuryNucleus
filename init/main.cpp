@@ -1,15 +1,16 @@
 #include <arch/alloc/init_services.hpp>
 #include "services/logger.hpp"
 #include "services/fbcon.hpp"
-#include "general.hpp"
+#include "main.hpp"
 
-#include <debug/logging.hpp>
+bool not_crashed = true;
 
 void Initialization::General()
 {
-    // init
     Debug::Logging::init();
     Graphics::fbcon::init();
-    // misc
-    // end
+    while (not_crashed)
+    {
+        //...
+    }
 }

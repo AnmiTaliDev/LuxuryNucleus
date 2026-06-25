@@ -1,5 +1,5 @@
+ENTRY(init_boot)
 SECTIONS {
-    ENTRY(init_boot)
     mmio_addr_alloc_kernel_start = 2M;
     . = mmio_addr_alloc_kernel_start;
 
@@ -23,9 +23,9 @@ SECTIONS {
         mmio_addr_alloc_rodata_start = .;
         *(.rodata)
 
-        mmio_addr_alloc_initservices_start = .;
-        KEEP(*(.rodata.init_services))
-        mmio_addr_alloc_initservices_end = .;
+        providers_graphics_start = .;
+        *(.providers_graphics)
+        providers_graphics_end = .;
 
         mmio_addr_alloc_rodata_end = .;
     }

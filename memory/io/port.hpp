@@ -4,8 +4,8 @@ namespace Memory
     {
         namespace Ports
         {
-            extern void write(const volatile unsigned short &port, const unsigned char value);
-            extern unsigned char read(const volatile unsigned short &port);
+            extern void write(const unsigned short &port, const char value);
+            extern char read(const unsigned short &port);
         }
     }
 }

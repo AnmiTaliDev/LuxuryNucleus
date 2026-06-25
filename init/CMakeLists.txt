@@ -1,4 +1,4 @@
-add_library(init_general OBJECT general.cpp)
-target_link_libraries(lnucleus PRIVATE init_general)
+add_library(init_main OBJECT main.cpp)
+target_link_libraries(lnucleus PRIVATE init_main)
 
 add_subdirectory(services)

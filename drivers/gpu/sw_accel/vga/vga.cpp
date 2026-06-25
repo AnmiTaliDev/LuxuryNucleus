@@ -6,29 +6,28 @@ VGA text framebuffer driver for legacy BIOS
 #include <debug/logging.hpp>
 #include <memory/io/port.hpp>
 #include <memory/alloc.hpp>
-#include <library/strings.hpp>
+#include <providers/graphics/import.hpp>
+#include <library/str_int.hpp>
 #include <library/libfb.hpp>
 #include "vga_colors.hpp"
 #include "vga.hpp"
-using namespace Drivers::Graphics::FB;
-using namespace Miscellaneous::FB::VGA;
+using namespace Drivers::Graphics::GPU::Software;
+using namespace Miscellaneous::Graphics::GPU::VGA;
 using namespace Memory::IO;
 using namespace Library;
 
-const volatile unsigned short pmio_addr_vga_register_port_1 = 0x3D4;
-const volatile unsigned short pmio_addr_vga_register_port_2 = 0x3D5;
+const unsigned short pmio_addr_vga_register_port_1 = 0x3D4;
+const unsigned short pmio_addr_vga_register_port_2 = 0x3D5;
 #define mmio_addr_vga_text_fb_colour     0xB8000
 #define mmio_addr_vga_text_fb_monochrome 0xB0000
 #define mmio_addr_vga_graphics_fb        0xA0000
-const volatile unsigned vga_text_height = 25;
-const volatile unsigned vga_text_width = 80;
 
-//volatile unsigned char *const vga_graphics_buffer = ;
-volatile unsigned short *volatile vga_text_buffer;
-volatile unsigned short *volatile vga_text_scroll_buffer;
-Library::FB *vga_text_libfb;
-volatile unsigned short attribute;
 bool VGA_text::inited = false;
+Library::FB *vga_text_libfb;
+// char *const vga_graphics_buffer = ;
+unsigned short *vga_text_buffer,
+               *vga_text_scroll_buffer,
+               attribute;
 
 static void put_entry(const unsigned short entry) 
 {
@@ -37,7 +36,7 @@ static void put_entry(const unsigned short entry)
 
 static void fill_with_zeros()
 {
-    for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
+    for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_libfb->width; vga_text_libfb->column++)
 	    put_entry(0);
     vga_text_libfb->column = 0;
 }
@@ -47,7 +46,7 @@ static void set_attr(const enum vga_colors &foreground, const enum vga_colors &b
     attribute = (foreground | background << 4 | blink << 7) << 8;
 }
 
-static void enable_cursor(const unsigned char &high_scanline, const unsigned char &low_scanline)
+static void enable_cursor(const char &high_scanline, const char &low_scanline)
 {
     Ports::write(pmio_addr_vga_register_port_1, 0x0A);
 	Ports::write(pmio_addr_vga_register_port_2, (Ports::read(pmio_addr_vga_register_port_2) & 0xC0) | high_scanline);
@@ -75,12 +74,12 @@ static void scroll()
 {
     for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
     {
-        volatile unsigned row = vga_text_libfb->TwoD_row();
-        for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
+        unsigned row = vga_text_libfb->TwoD_row();
+        for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_libfb->width; vga_text_libfb->column++)
             vga_text_scroll_buffer[vga_text_libfb->column] = vga_text_buffer[vga_text_libfb->TwoD_plus_column(row)];
         vga_text_libfb->row--;
 
-        for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_width; vga_text_libfb->column++)
+        for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_libfb->width; vga_text_libfb->column++)
             put_entry(vga_text_scroll_buffer[vga_text_libfb->column]);
         vga_text_libfb->row++;
     }
@@ -88,7 +87,7 @@ static void scroll()
     fill_with_zeros();
 }
 
-void VGA_text::put_char(const volatile char &what)
+void VGA_text::put_char(const char &what)
 {
     switch (what)
     {
@@ -96,18 +95,19 @@ void VGA_text::put_char(const volatile char &what)
             vga_text_libfb->column = 0;
             break;
         case '\n':
-            vga_text_libfb->column = 0;
-            vga_text_libfb->row++;
-            break;
-        case '\t':
-            vga_text_libfb->column++;
+            vga_text_libfb->newline();
             break;
         default:
+            if (vga_text_libfb->newline_at_end)
+            {
+                scroll();
+                vga_text_libfb->newline_at_end = false;
+            }
             put_entry(what);
             vga_text_libfb->next_column();
             break;
     }
-	if (vga_text_libfb->row == vga_text_libfb->height) scroll();
+	if (vga_text_libfb->row == vga_text_libfb->height) vga_text_libfb->newline_at_end = true;
 }
 
 void VGA_text::init()
@@ -120,11 +120,11 @@ void VGA_text::init()
         {
             case BDA::vga_display_type::COLOUR:
                 Debug::Logging::info("[vga/text]: detected colour video type");
-                vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_colour);
+                vga_text_buffer = reinterpret_cast<unsigned short *>(mmio_addr_vga_text_fb_colour);
                 break;
             case BDA::vga_display_type::MONOCHROME:
                 Debug::Logging::info("[vga/text]: detected monochrome video type");
-                vga_text_buffer = reinterpret_cast<volatile unsigned short*>(mmio_addr_vga_text_fb_monochrome);
+                vga_text_buffer = reinterpret_cast<unsigned short *>(mmio_addr_vga_text_fb_monochrome);
                 break;
             case BDA::vga_display_type::NONE:
                 Debug::Logging::warn("[vga/text]: video display is not present.");
@@ -133,15 +133,12 @@ void VGA_text::init()
                 Debug::Logging::err("[vga/text]: failed to get video type");
                 return;
         }
-        Debug::Logging::info("[vga/text]: checking size...");
-        if (Library::Strings::length_of(vga_text_buffer) == 32775)
-        {
-            vga_text_scroll_buffer = static_cast<volatile unsigned short*>(Memory::alloc(vga_text_width));
-            *vga_text_libfb = Library::FB{vga_text_width,vga_text_height};
-            clean();
-            inited = true;
-        }
-        else
-            Debug::Logging::err("invalid size");
+        vga_text_scroll_buffer = Memory::allocate<unsigned short>(80);
+        static Library::FB vga_text_libfb_instance{80,25};
+        vga_text_libfb = &vga_text_libfb_instance;
+        clean();
+        inited = true;
     }
 }
+
+GPU_provider_import(VGA,VGA_text::put_char,VGA_text::init,&VGA_text::inited)

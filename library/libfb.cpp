@@ -18,21 +18,19 @@ unsigned FB::TwoD_row()
     return row * width;
 }
 
-unsigned FB::TwoD_plus_column(volatile unsigned &row)
+unsigned FB::TwoD_plus_column(unsigned &row)
 {
     return row + column;
 }
 
 unsigned FB::TwoD()
 {
-    volatile unsigned row = TwoD_row();
+    unsigned row = TwoD_row();
     return TwoD_plus_column(row);
 }
 
-FB::FB(const unsigned width_, const unsigned height_)
+FB::FB(const unsigned long long _width, const unsigned long long _height)
 {
-    width = width_;
-    height = height_;
-    column = 0;
-    row = 0;
+    width = _width;
+    height = _height;
 }
