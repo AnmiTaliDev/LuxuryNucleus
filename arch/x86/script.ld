@@ -3,39 +3,45 @@ SECTIONS {
     mmio_addr_alloc_kernel_start = 2M;
     . = mmio_addr_alloc_kernel_start;
 
-    .text :
+    .headers :
     {
-        KEEP(*(.multiboot2))
-        mmio_addr_alloc_text_start = .;
-        *(.text)
-        mmio_addr_alloc_text_end = .;
+        KEEP(*(.headers.multiboot2))
     }
 
-    .bss :
+    .text :
     {
-        mmio_addr_alloc_bss_start = .;
-        *(.bss)
-        mmio_addr_alloc_bss_end = .;
+        mmio_addr_alloc_text_start = ABSOLUTE(.);
+        *(.text)
+        mmio_addr_alloc_text_end = ABSOLUTE(.);
     }
 
     .rodata :
     {
-        mmio_addr_alloc_rodata_start = .;
+        mmio_addr_alloc_rodata_start = ABSOLUTE(.);
         *(.rodata)
-
-        providers_graphics_start = .;
-        *(.providers_graphics)
-        providers_graphics_end = .;
-
-        mmio_addr_alloc_rodata_end = .;
+        mmio_addr_alloc_rodata_end = ABSOLUTE(.);
     }
 
     .data :
     {
-        mmio_addr_alloc_data_start = .;
+        mmio_addr_alloc_data_start = ABSOLUTE(.);
         *(.data)
-        mmio_addr_alloc_data_end = .;
+        mmio_addr_alloc_data_end = ABSOLUTE(.);
     }
 
-    mmio_addr_alloc_kernel_end = .;
+    .bss :
+    {
+        mmio_addr_alloc_bss_start = ABSOLUTE(.);
+        *(.bss)
+        mmio_addr_alloc_bss_end = ABSOLUTE(.);
+    }
+
+    .providers_graphics :
+    {
+        providers_graphics_start = ABSOLUTE(.);
+        KEEP(*(.providers_graphics))
+        providers_graphics_end = ABSOLUTE(.);
+    }
+
+    mmio_addr_alloc_kernel_end = ABSOLUTE(.);
 }

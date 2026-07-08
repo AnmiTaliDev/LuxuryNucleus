@@ -2,8 +2,5 @@
 
 namespace Providers
 {
-    namespace Graphics
-    {
-        void (*provide())(const char &);
-    }
+    Graphics::GPU_provider_info *provide_gpu();
 }

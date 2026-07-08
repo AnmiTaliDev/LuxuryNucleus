@@ -18,15 +18,12 @@ halt:
 .code32
 init_boot:
     in al, 0x92
-    test al, 2
-    jnz after
     or al, 2
-    and al, 0xFE
     out 0x92, al
-    after:
-#if ARCH_CAP == 32
+#if __SIZEOF_POINTER__ == 4
     mov esp, offset stack_top
     call init_main
-#elif ARCH_CAP == 64
+#elif __SIZEOF_POINTER__ == 8
 
 #endif
+    jmp halt

@@ -8,11 +8,9 @@ VGA text framebuffer driver for legacy BIOS
 #include <memory/alloc.hpp>
 #include <providers/graphics/import.hpp>
 #include <library/str_int.hpp>
-#include <library/libfb.hpp>
 #include "vga_colors.hpp"
-#include "vga.hpp"
-using namespace Drivers::Graphics::GPU::Software;
 using namespace Miscellaneous::Graphics::GPU::VGA;
+using namespace Drivers;
 using namespace Memory::IO;
 using namespace Library;
 
@@ -21,24 +19,26 @@ const unsigned short pmio_addr_vga_register_port_2 = 0x3D5;
 #define mmio_addr_vga_text_fb_colour     0xB8000
 #define mmio_addr_vga_text_fb_monochrome 0xB0000
 #define mmio_addr_vga_graphics_fb        0xA0000
+#define vga_width 80
+#define vga_height 25
 
-bool VGA_text::inited = false;
-Library::FB *vga_text_libfb;
+bool inited = false, newline_at_end;
 // char *const vga_graphics_buffer = ;
 unsigned short *vga_text_buffer,
                *vga_text_scroll_buffer,
                attribute;
+char X = 0, Y = 0;
 
 static void put_entry(const unsigned short entry) 
 {
-	vga_text_buffer[vga_text_libfb->TwoD()] = entry | attribute;
+	vga_text_buffer[Y * vga_width + X] = entry | attribute;
 }
 
 static void fill_with_zeros()
 {
-    for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_libfb->width; vga_text_libfb->column++)
+    for (X = 0; X != vga_width; X++)
 	    put_entry(0);
-    vga_text_libfb->column = 0;
+    X = 0;
 }
 
 static void set_attr(const enum vga_colors &foreground, const enum vga_colors &background, const bool &blink)
@@ -46,6 +46,7 @@ static void set_attr(const enum vga_colors &foreground, const enum vga_colors &b
     attribute = (foreground | background << 4 | blink << 7) << 8;
 }
 
+/*
 static void enable_cursor(const char &high_scanline, const char &low_scanline)
 {
     Ports::write(pmio_addr_vga_register_port_1, 0x0A);
@@ -54,6 +55,7 @@ static void enable_cursor(const char &high_scanline, const char &low_scanline)
 	Ports::write(pmio_addr_vga_register_port_1, 0x0B);
 	Ports::write(pmio_addr_vga_register_port_2, (Ports::read(pmio_addr_vga_register_port_2) & 0xE0) | low_scanline);
 }
+*/
 
 static void disable_cursor()
 {
@@ -65,52 +67,52 @@ static void clean()
 {
     set_attr(LIGHT_GRAY, BLACK, 0);
     disable_cursor();
-    for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
+    for (Y = 0; Y != vga_height; Y++)
         fill_with_zeros();
-    vga_text_libfb->row = 0;
+    Y = 0;
 }
 
 static void scroll()
 {
-    for (vga_text_libfb->row = 0; vga_text_libfb->row != vga_text_libfb->height; vga_text_libfb->row++)
+    for (Y = 0; Y != vga_height; Y++)
     {
-        unsigned row = vga_text_libfb->TwoD_row();
-        for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_libfb->width; vga_text_libfb->column++)
-            vga_text_scroll_buffer[vga_text_libfb->column] = vga_text_buffer[vga_text_libfb->TwoD_plus_column(row)];
-        vga_text_libfb->row--;
+        char row_width = Y * vga_width;
+        for (X = 0; X != vga_width; X++)
+            vga_text_scroll_buffer[X] = vga_text_buffer[row_width + X];
+        Y--;
 
-        for (vga_text_libfb->column = 0; vga_text_libfb->column != vga_text_libfb->width; vga_text_libfb->column++)
-            put_entry(vga_text_scroll_buffer[vga_text_libfb->column]);
-        vga_text_libfb->row++;
+        for (X = 0; X != vga_width; X++)
+            put_entry(vga_text_scroll_buffer[X]);
+        Y++;
     }
-    vga_text_libfb->row = 24;
+    Y = 24;
     fill_with_zeros();
 }
 
-void VGA_text::put_char(const char &what)
+static void put_char(const char &what)
 {
     switch (what)
     {
         case '\r': 
-            vga_text_libfb->column = 0;
+            X = 0;
             break;
         case '\n':
-            vga_text_libfb->newline();
+            Y++; X = 0;
             break;
         default:
-            if (vga_text_libfb->newline_at_end)
+            if (newline_at_end)
             {
                 scroll();
-                vga_text_libfb->newline_at_end = false;
+                newline_at_end = false;
             }
             put_entry(what);
-            vga_text_libfb->next_column();
+            if (X++ == vga_width) Y++;
             break;
     }
-	if (vga_text_libfb->row == vga_text_libfb->height) vga_text_libfb->newline_at_end = true;
+	if (Y == vga_height) newline_at_end = true;
 }
 
-void VGA_text::init()
+static void init()
 {
     if (!inited)
     {
@@ -134,11 +136,12 @@ void VGA_text::init()
                 return;
         }
         vga_text_scroll_buffer = Memory::allocate<unsigned short>(80);
-        static Library::FB vga_text_libfb_instance{80,25};
-        vga_text_libfb = &vga_text_libfb_instance;
         clean();
         inited = true;
     }
 }
 
-GPU_provider_import(VGA,VGA_text::put_char,VGA_text::init,&VGA_text::inited)
+void (*const init_ptr)() = init;
+void (*const pur_char_ptr)(const char &) = put_char;
+
+GPU_provider_import(VGA,&pur_char_ptr,&init_ptr,&inited)

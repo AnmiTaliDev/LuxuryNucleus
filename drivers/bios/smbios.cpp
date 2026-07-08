@@ -1,3 +1,4 @@
+/*
 #include <library/str_int.hpp>
 #include <memory/alloc.hpp>
 using namespace Library::Str_Int;
@@ -25,12 +26,12 @@ static bool check_eps()
 {
     while (EPS != reinterpret_cast<char *>(0xFFFFF))
     {
-#if ARCH_CAP == 64
-        if (same(EPS,"_SM3_",bit64_size))
-            if (chksum(EPS[5])) break;
-#endif
+#ifdef i386
         if (same(EPS,"_SM_",bit32_size))
             if (chksum(EPS[4])) break;
+#endif
+        if (same(EPS,"_SM3_",bit64_size))
+            if (chksum(EPS[5])) break;
         EPS += 16;
     }
     if (reinterpret_cast<unsigned>(EPS) == 0x100000)
@@ -38,3 +39,4 @@ static bool check_eps()
     else
         return true;
 }
+*/

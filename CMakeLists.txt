@@ -13,10 +13,10 @@ endif()
 
 set(arch_bit_capacity "" CACHE STRING "The target bit capacity of architecture.")
 if ( arch_bit_capacity STREQUAL "32" )
-    add_compile_options(-DARCH_CAP=32 -m32)
+    add_compile_options(-m32)
     add_link_options(-m32)
 elseif ( arch_bit_capacity STREQUAL "64" )
-    add_compile_options(-DARCH_CAP=64 -m64 -mcmodel=large)
+    add_compile_options(-m64 -mcmodel=large)
     add_link_options(-m64)
 else()
     message(FATAL_ERROR "Please, choose the valid bit capacity of architecture (32 or 64 bit).")
@@ -29,9 +29,9 @@ elseif ( CMAKE_CXX_COMPILER STREQUAL "clang++" )
     add_compile_options(--target=${cross})
 endif()
 
-add_compile_options(-Wall -Wextra -ffreestanding -nostdlib -fno-pic -fno-pie -no-pie -fno-rtti -fno-plt -mno-red-zone -fpermissive
+add_compile_options(-Wall -Wextra -Wno-char-subscripts -Werror -ffreestanding -nostdlib -fno-pic -fno-pie -no-pie -fno-rtti -fno-plt -mno-red-zone -fpermissive
 -fno-stack-protector -fno-stack-clash-protection -fno-stack-check -fno-threadsafe-statics 
--fno-signed-char -funsigned-char -O0)
+-fno-signed-char -funsigned-char -O0 )
 add_link_options(-ffreestanding -nostdlib -fno-pic -fno-pie -no-pie -Wl,-nostdlib,-no-pie,-z,noexecstack)
 include_directories("${CMAKE_SOURCE_DIR}")
 

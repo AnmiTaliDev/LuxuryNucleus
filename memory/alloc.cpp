@@ -1,21 +1,19 @@
-#include <arch/alloc/kernel.hpp>
 #include "alloc.hpp"
 
+extern char *mmio_addr_alloc_kernel_end asm("mmio_addr_alloc_kernel_end");
 char *index = mmio_addr_alloc_kernel_end;
 
 void *Memory::malloc(const unsigned long long &size)
 {
-    char *ptr;
     if (size > 1)
     {
         bool give_this; unsigned long long i;
         while (true)
         {
             give_this = true;
-            ptr = index;
             for (i = 0; i != size + 1; ++i)
             {
-                if (ptr[i]) // != zero
+                if (index[i]) // != zero
                     give_this = false;
                 else if (!give_this)
                     break;
@@ -25,7 +23,7 @@ void *Memory::malloc(const unsigned long long &size)
                 break;
         }
     }
-    return ptr;
+    return index;
 }
 
 void Memory::free(void *ptr, const unsigned long long &size)

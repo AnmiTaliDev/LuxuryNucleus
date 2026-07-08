@@ -4,10 +4,10 @@ namespace Providers
     {
         struct GPU_provider_info
         {
-            const char *name;
-            bool *inited;
-            void (*func)(const char &);
-            void (*init_func)();
+            const char *const name;
+            bool *const inited;
+            void (*const *const func)(const char &);
+            void (*const *const init_func)();
         };
     }
 }
