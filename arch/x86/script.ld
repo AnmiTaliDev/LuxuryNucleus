@@ -3,13 +3,9 @@ SECTIONS {
     mmio_addr_alloc_kernel_start = 2M;
     . = mmio_addr_alloc_kernel_start;
 
-    .headers :
-    {
-        KEEP(*(.headers.multiboot2))
-    }
-
     .text :
     {
+        KEEP(*(.multiboot2))
         mmio_addr_alloc_text_start = ABSOLUTE(.);
         *(.text)
         mmio_addr_alloc_text_end = ABSOLUTE(.);
@@ -41,6 +37,11 @@ SECTIONS {
         providers_graphics_start = ABSOLUTE(.);
         KEEP(*(.providers_graphics))
         providers_graphics_end = ABSOLUTE(.);
+    }
+
+    /DISCARD/ :
+    {
+        *(.eh_frame*)
     }
 
     mmio_addr_alloc_kernel_end = ABSOLUTE(.);
