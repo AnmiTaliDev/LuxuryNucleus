@@ -1,6 +1,6 @@
 #include "alloc.hpp"
 
-extern char *mmio_addr_alloc_kernel_end asm("mmio_addr_alloc_kernel_end");
+extern char mmio_addr_alloc_kernel_end[] asm("mmio_addr_alloc_kernel_end");
 char *index = mmio_addr_alloc_kernel_end;
 
 void *Memory::malloc(const unsigned long long &size)

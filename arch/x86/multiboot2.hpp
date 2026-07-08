@@ -11,7 +11,7 @@ namespace Architecture
                 const unsigned size;
             };
 
-            struct __attribute__((packed)) header
+            struct header
             {
                 const unsigned magic;
                 const unsigned architecture;

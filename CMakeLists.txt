@@ -31,19 +31,20 @@ endif()
 
 add_compile_options(-Wall -Wextra -Wno-char-subscripts -Werror -ffreestanding -nostdlib -fno-pic -fno-pie -no-pie -fno-rtti -fno-plt -mno-red-zone -fpermissive
 -fno-stack-protector -fno-stack-clash-protection -fno-stack-check -fno-threadsafe-statics 
--fno-signed-char -funsigned-char -O0 )
+-fno-signed-char -funsigned-char -O0)
 add_link_options(-ffreestanding -nostdlib -fno-pic -fno-pie -no-pie -Wl,-nostdlib,-no-pie,-z,noexecstack)
 include_directories("${CMAKE_SOURCE_DIR}")
 
 string(FIND "${CXXFLAGS}" "-Werror" POSITION)
 if ( "${POSITION}" EQUAL -1 )
-    message(WARNING "LuxuryNucleus is in testing & development mode, not for production. Please, use -Werror option to make kernel stable.")
+    message(WARNING "lnucleus is in testing & development mode, not for production. Please, use -Werror option to make kernel stable.")
     set(CMAKE_BUILD_TYPE Debug)
 else()
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-add_library(lnucleus STATIC)
+add_executable(lnucleus)
+set_target_properties(lnucleus PROPERTIES OUTPUT_NAME "lnucleus" SUFFIX ".elf")
 
 add_subdirectory(arch)
 add_subdirectory(library)
